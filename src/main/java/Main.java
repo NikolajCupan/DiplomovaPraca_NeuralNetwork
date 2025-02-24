@@ -1,6 +1,9 @@
+import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
+import NeuralNetwork.ActivationFunctions.Softmax;
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataRow;
-import NeuralNetwork.Layer;
+import NeuralNetwork.Layers.ActivationLayer;
+import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.Neuron;
 
 public class Main {
@@ -25,6 +28,12 @@ public class Main {
         return layer;
     }
 
+    public static ActivationLayer getActivationLayer1() {
+        return new ActivationLayer(
+                new RectifiedLinearUnit()
+        );
+    }
+
     public static Layer getLayer2() {
         final Neuron neuron1 = new Neuron(
                 -1.0, new Double[]{ 0.1, -0.14, 0.5 }
@@ -46,6 +55,12 @@ public class Main {
         return layer;
     }
 
+    public static ActivationLayer getActivationLayer2() {
+        return new ActivationLayer(
+                new Softmax()
+        );
+    }
+
     public static Batch getBatch() {
         final Batch batch = new Batch();
 
@@ -61,15 +76,22 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        final Layer layer1 = getLayer1();
-        final Layer layer2 = getLayer2();
-
         final Batch inputBatch = getBatch();
+
+        final Layer layer1 = getLayer1();
+        final ActivationLayer activationLayer1 = getActivationLayer1();
+        final Layer layer2 = getLayer2();
+        final ActivationLayer activationLayer2 = getActivationLayer2();
+
         final Batch outputBatch1 = layer1.calculateOutputBatch(inputBatch);
-        final Batch outputBatch2 = layer2.calculateOutputBatch(outputBatch1);
+        final Batch outputBatch2 = activationLayer1.calculateOutputBatch(outputBatch1);
+        final Batch outputBatch3 = layer2.calculateOutputBatch(outputBatch2);
+        final Batch outputBatch4 = activationLayer2.calculateOutputBatch(outputBatch3);
 
         System.out.println(inputBatch);
         System.out.println(outputBatch1);
         System.out.println(outputBatch2);
+        System.out.println(outputBatch3);
+        System.out.println(outputBatch4);
     }
 }

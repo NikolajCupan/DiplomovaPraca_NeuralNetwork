@@ -1,6 +1,6 @@
 package Utilities;
 
-public class Math {
+public class CustomMath {
     public static double dotProduct(
             final Double[] left,
             final Double[] right

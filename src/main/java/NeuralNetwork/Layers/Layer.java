@@ -1,9 +1,12 @@
-package NeuralNetwork;
+package NeuralNetwork.Layers;
+
+import NeuralNetwork.DataRow;
+import NeuralNetwork.Neuron;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Layer {
+public class Layer implements ILayer {
     private final List<Neuron> neurons;
 
     public Layer() {
@@ -22,19 +25,7 @@ public class Layer {
         this.neurons.add(neuron);
     }
 
-    public Batch calculateOutputBatch(final Batch batch) {
-        final Batch outputBatch = new Batch();
-
-        for (int i = 0; i < batch.getBatchSize(); ++i) {
-            final DataRow inputRow = batch.getInputRow(i);
-            final DataRow calculatedRow = this.calculateOutputRow(inputRow);
-
-            outputBatch.addInputRow(calculatedRow);
-        }
-
-        return outputBatch;
-    }
-
+    @Override
     public DataRow calculateOutputRow(final DataRow inputRow) {
         final DataRow outputRow = new DataRow(this.neurons.size());
 
@@ -44,5 +35,22 @@ public class Layer {
         }
 
         return outputRow;
+    }
+
+    @Override
+    public String toString() {
+        if (this.neurons.isEmpty()) {
+            return "{ Layer: empty }";
+        }
+
+        final StringBuilder builder = new StringBuilder();
+
+        builder.append("{ Layer: input [");
+        builder.append(this.neurons.getLast().getWeightsSize());
+        builder.append("], output [");
+        builder.append(this.neurons.size());
+        builder.append("] }");
+
+        return builder.toString();
     }
 }

@@ -1,6 +1,6 @@
 package NeuralNetwork;
 
-import Utilities.Math;
+import Utilities.CustomMath;
 
 import java.util.Random;
 
@@ -21,10 +21,7 @@ public class Neuron {
         }
     }
 
-    public Neuron(
-            final double bias,
-            final Double[] weights
-    ) {
+    public Neuron(final double bias, final Double[] weights) {
         this.bias = bias;
         this.weights = weights;
     }
@@ -34,7 +31,7 @@ public class Neuron {
            throw new IllegalArgumentException("Size of input row [" + inputRow.getDataRowSize() + "] is not equal to size of weights [" + this.weights.length + "]");
         }
 
-        final double dotProduct = Math.dotProduct(this.weights, inputRow.getDataRowValues());
+        final double dotProduct = CustomMath.dotProduct(this.weights, inputRow.getDataRowValues());
         return dotProduct + this.bias;
     }
 
