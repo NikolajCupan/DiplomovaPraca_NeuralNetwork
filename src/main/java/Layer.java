@@ -9,6 +9,14 @@ public class Layer {
     }
 
     public void addNeuron(final Neuron neuron) {
+        if (!this.neurons.isEmpty()) {
+            final long weightsSize = this.neurons.getLast().getWeightsSize();
+
+            if (neuron.getWeightsSize() != weightsSize) {
+                throw new IllegalArgumentException("New neuron weights size [" + neuron.getWeightsSize() + "] is not equal to current weights size [" + weightsSize + "]");
+            }
+        }
+
         this.neurons.add(neuron);
     }
 

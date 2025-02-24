@@ -4,7 +4,7 @@ public class Math {
             final Double[] right
     ) {
         if (left.length != right.length) {
-            throw new IllegalArgumentException("Length of left input [" + left.length + "] is not equal to length of right input [" + right.length + "]");
+            throw new IllegalArgumentException("Size of left input [" + left.length + "] is not equal to size of right input [" + right.length + "]");
         }
 
         double result = 0.0;

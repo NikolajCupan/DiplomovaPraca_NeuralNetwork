@@ -2,7 +2,7 @@ public class Neuron {
     private final double bias;
     private final Double[] weights;
 
-    private final int weightsLength;
+    private final long weightsSize;
 
     public Neuron(
             final double bias,
@@ -11,15 +11,19 @@ public class Neuron {
         this.bias = bias;
         this.weights = weights;
 
-        this.weightsLength = weights.length;
+        this.weightsSize = weights.length;
     }
 
     public double calculateOutput(final Double[] inputs) {
-        if (this.weightsLength != inputs.length) {
-           throw new IllegalArgumentException("Length of inputs [" + inputs.length + "] is not equal to length of weights [" + this.weightsLength + "]");
+        if (this.weightsSize != inputs.length) {
+           throw new IllegalArgumentException("Size of inputs [" + inputs.length + "] is not equal to size of weights [" + this.weightsSize + "]");
         }
 
         final double dotProduct = Math.dotProduct(this.weights, inputs);
         return dotProduct + this.bias;
+    }
+
+    public long getWeightsSize() {
+        return this.weightsSize;
     }
 }
