@@ -41,17 +41,30 @@ public class Main {
         return layer;
     }
 
+    public static Batch getBatch() {
+        final Batch batch = new Batch();
+
+        final Double[] inputs1 = new Double[]{ 1.0, 2.0, 3.0, 2.5 };
+        final Double[] inputs2 = new Double[]{ 2.0, 5.0, -1.0, 2.0 };
+        final Double[] inputs3 = new Double[]{ -1.5, 2.7, 3.3, -0.8 };
+
+        batch.addInputs(inputs1);
+        batch.addInputs(inputs2);
+        batch.addInputs(inputs3);
+
+        return batch;
+    }
+
     public static void main(String[] args) {
         final Layer layer1 = getLayer1();
         final Layer layer2 = getLayer2();
 
-        final Double[] outputs1 = layer1.calculateOutputs(new Double[]{ 1.0, 2.0, 3.0, 2.5 });
-        Helper.printArray(outputs1);
+        final Batch inputBatch = getBatch();
+        final Batch outputBatch1 = layer1.calculateOutputs(inputBatch);
+        final Batch outputBatch2 = layer2.calculateOutputs(outputBatch1);
 
-        final Double[] outputs2 = layer1.calculateOutputs(new Double[]{ 2.0, 5.0, -1.0, 2.0 });
-        Helper.printArray(outputs2);
-
-        final Double[] outputs3 = layer1.calculateOutputs(new Double[]{ -1.5, 2.7, 3.3, -0.8 });
-        Helper.printArray(outputs3);
+        System.out.println(inputBatch);
+        System.out.println(outputBatch1);
+        System.out.println(outputBatch2);
     }
 }

@@ -20,6 +20,20 @@ public class Layer {
         this.neurons.add(neuron);
     }
 
+    public Batch calculateOutputs(final Batch batch) {
+        final Batch outputBatch = new Batch();
+
+        for (int i = 0; i < batch.getBatchSize(); ++i) {
+            final Double[] inputs = batch.getInputs(i);
+
+            outputBatch.addInputs(
+                    this.calculateOutputs(inputs)
+            );
+        }
+
+        return outputBatch;
+    }
+
     public Double[] calculateOutputs(final Double[] inputs) {
         final Double[] outputs = new Double[this.neurons.size()];
 
