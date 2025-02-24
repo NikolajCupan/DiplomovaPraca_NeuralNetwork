@@ -1,3 +1,5 @@
+package NeuralNetwork;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,27 +22,27 @@ public class Layer {
         this.neurons.add(neuron);
     }
 
-    public Batch calculateOutputs(final Batch batch) {
+    public Batch calculateOutputBatch(final Batch batch) {
         final Batch outputBatch = new Batch();
 
         for (int i = 0; i < batch.getBatchSize(); ++i) {
-            final Double[] inputs = batch.getInputs(i);
+            final DataRow inputRow = batch.getInputRow(i);
+            final DataRow calculatedRow = this.calculateOutputRow(inputRow);
 
-            outputBatch.addInputs(
-                    this.calculateOutputs(inputs)
-            );
+            outputBatch.addInputRow(calculatedRow);
         }
 
         return outputBatch;
     }
 
-    public Double[] calculateOutputs(final Double[] inputs) {
-        final Double[] outputs = new Double[this.neurons.size()];
+    public DataRow calculateOutputRow(final DataRow inputRow) {
+        final DataRow outputRow = new DataRow(this.neurons.size());
 
         for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
-            outputs[neuronIndex] = this.neurons.get(neuronIndex).calculateOutput(inputs);
+            final Double neuronOutput = this.neurons.get(neuronIndex).calculateOutput(inputRow);
+            outputRow.setValue(neuronIndex, neuronOutput);
         }
 
-        return outputs;
+        return outputRow;
     }
 }

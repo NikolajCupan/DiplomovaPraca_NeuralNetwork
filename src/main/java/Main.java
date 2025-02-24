@@ -1,3 +1,8 @@
+import NeuralNetwork.Batch;
+import NeuralNetwork.DataRow;
+import NeuralNetwork.Layer;
+import NeuralNetwork.Neuron;
+
 public class Main {
     public static Layer getLayer1() {
         final Neuron neuron1 = new Neuron(
@@ -44,13 +49,13 @@ public class Main {
     public static Batch getBatch() {
         final Batch batch = new Batch();
 
-        final Double[] inputs1 = new Double[]{ 1.0, 2.0, 3.0, 2.5 };
-        final Double[] inputs2 = new Double[]{ 2.0, 5.0, -1.0, 2.0 };
-        final Double[] inputs3 = new Double[]{ -1.5, 2.7, 3.3, -0.8 };
+        final DataRow inputs1 = new DataRow(new Double[]{ 1.0, 2.0, 3.0, 2.5 });
+        final DataRow inputs2 = new DataRow(new Double[]{ 2.0, 5.0, -1.0, 2.0 });
+        final DataRow inputs3 = new DataRow(new Double[]{ -1.5, 2.7, 3.3, -0.8 });
 
-        batch.addInputs(inputs1);
-        batch.addInputs(inputs2);
-        batch.addInputs(inputs3);
+        batch.addInputRow(inputs1);
+        batch.addInputRow(inputs2);
+        batch.addInputRow(inputs3);
 
         return batch;
     }
@@ -60,8 +65,8 @@ public class Main {
         final Layer layer2 = getLayer2();
 
         final Batch inputBatch = getBatch();
-        final Batch outputBatch1 = layer1.calculateOutputs(inputBatch);
-        final Batch outputBatch2 = layer2.calculateOutputs(outputBatch1);
+        final Batch outputBatch1 = layer1.calculateOutputBatch(inputBatch);
+        final Batch outputBatch2 = layer2.calculateOutputBatch(outputBatch1);
 
         System.out.println(inputBatch);
         System.out.println(outputBatch1);

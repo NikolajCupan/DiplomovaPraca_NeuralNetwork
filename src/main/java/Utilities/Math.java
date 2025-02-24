@@ -1,3 +1,5 @@
+package Utilities;
+
 public class Math {
     public static double dotProduct(
             final Double[] left,
