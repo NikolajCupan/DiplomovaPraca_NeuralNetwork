@@ -12,8 +12,8 @@ public class Layer {
         this.neurons.add(neuron);
     }
 
-    public double[] calculateOutputs(final double[] inputs) {
-        final double[] outputs = new double[this.neurons.size()];
+    public Double[] calculateOutputs(final Double[] inputs) {
+        final Double[] outputs = new Double[this.neurons.size()];
 
         for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
             outputs[neuronIndex] = this.neurons.get(neuronIndex).calculateOutput(inputs);

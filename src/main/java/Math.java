@@ -1,7 +1,7 @@
 public class Math {
     public static double dotProduct(
-            final double[] left,
-            final double[] right
+            final Double[] left,
+            final Double[] right
     ) {
         if (left.length != right.length) {
             throw new IllegalArgumentException("Length of left input [" + left.length + "] is not equal to length of right input [" + right.length + "]");
