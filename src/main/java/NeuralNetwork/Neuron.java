@@ -23,7 +23,7 @@ public class Neuron {
         return dotProduct + this.bias;
     }
 
-    public long getWeightsSize() {
+    public int getWeightsSize() {
         return this.weights.length;
     }
 }

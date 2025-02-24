@@ -29,7 +29,7 @@ public class Batch {
     }
 
     // Number of input rows currently in batch
-    public long getBatchSize() {
+    public int getBatchSize() {
         return this.batch.size();
     }
 
