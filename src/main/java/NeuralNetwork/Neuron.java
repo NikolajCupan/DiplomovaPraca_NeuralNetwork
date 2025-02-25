@@ -38,4 +38,8 @@ public class Neuron {
     public int getWeightsSize() {
         return this.weights.length;
     }
+
+    public double getWeight(final int weightIndex) {
+        return this.weights[weightIndex];
+    }
 }

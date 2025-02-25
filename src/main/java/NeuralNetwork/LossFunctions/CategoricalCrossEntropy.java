@@ -21,7 +21,7 @@ public class CategoricalCrossEntropy implements ILossFunction {
     @Override
     public double calculate(final DataRow predictedRow, final int targetIndex) {
         final double predictedValue = predictedRow.getValue(targetIndex);
-        final double clampedValue = CustomMath.clamp(predictedValue, CLAMP_VALUE, 1.0 - CLAMP_VALUE);
+        final double clampedValue = Math.clamp(predictedValue, CLAMP_VALUE, 1.0 - CLAMP_VALUE);
 
         return -Math.log(clampedValue);
     }

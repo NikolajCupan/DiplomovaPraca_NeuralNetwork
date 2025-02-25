@@ -74,8 +74,4 @@ public class CustomMath {
 
         return sum;
     }
-
-    public static double clamp(final double value, final double min, final double max) {
-        return Math.max(min, Math.min(max, value));
-    }
 }
