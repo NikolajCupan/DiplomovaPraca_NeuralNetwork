@@ -30,7 +30,7 @@ public class Layer implements ILayer {
         final DataRow outputRow = new DataRow(this.neurons.size());
 
         for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
-            final Double neuronOutput = this.neurons.get(neuronIndex).calculateOutput(inputRow);
+            final double neuronOutput = this.neurons.get(neuronIndex).calculateOutput(inputRow);
             outputRow.setValue(neuronIndex, neuronOutput);
         }
 

@@ -3,7 +3,7 @@ package Utilities;
 import NeuralNetwork.DataRow;
 
 public class CustomMath {
-    public static Double dotProduct(
+    public static double dotProduct(
             final Double[] left,
             final Double[] right
     ) {
@@ -11,7 +11,7 @@ public class CustomMath {
             throw new IllegalArgumentException("Size of left input [" + left.length + "] is not equal to size of right input [" + right.length + "]");
         }
 
-        Double result = 0.0;
+        double result = 0.0;
         for (int i = 0; i < left.length; ++i) {
             result += left[i] * right[i];
         }
@@ -26,7 +26,7 @@ public class CustomMath {
 
         final Double[] dataRowValues = dataRow.getDataRowValues();
 
-        Double max = dataRowValues[0];
+        double max = dataRowValues[0];
         int maxIndex = 0;
 
         for (int i = 0; i < dataRowValues.length; ++i) {

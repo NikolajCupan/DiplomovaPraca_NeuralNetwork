@@ -25,11 +25,11 @@ public class DataRow {
         return this.dataValues;
     }
 
-    public Double getValue(final int index) {
+    public double getValue(final int index) {
         return this.dataValues[index];
     }
 
-    public void setValue(final int index, final Double value) {
+    public void setValue(final int index, final double value) {
         this.dataValues[index] = value;
     }
 
