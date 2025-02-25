@@ -4,33 +4,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Batch {
-    private final List<DataRow> batch;
+    private final List<DataList> batch;
 
     public Batch() {
         this.batch = new ArrayList<>();
     }
 
-    public void addDataRow(final DataRow dataRow) {
+    public void addRow(final DataList row) {
         if (!this.batch.isEmpty()) {
-            final int dataRowSize = this.batch.getLast().getDataRowSize();
+            final int rowSize = this.batch.getFirst().getDataListSize();
 
-            if (dataRow.getDataRowSize() != dataRowSize) {
+            if (row.getDataListSize() != rowSize) {
                 throw new IllegalArgumentException(
-                        "New data row size [" + dataRow.getDataRowSize() + "] is not equal to current data row size [" + dataRowSize + "]"
+                        "New row size [" + row.getDataListSize() + "] is not equal to current row size [" + rowSize + "]"
                 );
             }
         }
 
-        this.batch.add(dataRow);
+        this.batch.add(row);
     }
 
-    public DataRow getDataRow(final int index) {
-        return this.batch.get(index);
+    public DataList getRow(final int rowIndex) {
+        return this.batch.get(rowIndex);
     }
 
-    // Number of data rows currently in batch
-    public int getBatchSize() {
+    public DataList getColumn(final int columnIndex) {
+        final DataList outputColumn = new DataList(this.batch.size());
+
+        for (int rowIndex = 0; rowIndex < this.batch.size(); ++rowIndex) {
+            outputColumn.setValue(
+                    rowIndex,
+                    this.batch.get(rowIndex).getValue(columnIndex)
+            );
+        }
+
+        return outputColumn;
+    }
+
+    public int getRowsSize() {
         return this.batch.size();
+    }
+
+    public int getColumnsSize() {
+        return this.batch.getFirst().getDataListSize();
     }
 
     @Override
@@ -39,7 +55,7 @@ public class Batch {
         builder.append("[\n");
 
         boolean first = true;
-        for (final DataRow dataRow : this.batch) {
+        for (final DataList dataRow : this.batch) {
             if (!first) {
                 builder.append("\n");
             }

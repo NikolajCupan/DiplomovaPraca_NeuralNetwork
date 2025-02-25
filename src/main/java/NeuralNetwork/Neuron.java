@@ -8,13 +8,13 @@ public class Neuron {
     private static final double RANDOM_VALUES_SCALE = 0.01;
 
     private final double bias;
-    private final DataRow weights;
+    private final DataList weights;
 
     public Neuron(final int weightsSize, final long seed) {
         final Random random = new Random(seed);
 
         this.bias = 0.0;
-        this.weights = new DataRow(weightsSize);
+        this.weights = new DataList(weightsSize);
 
         for (int i = 0; i < weightsSize; ++i) {
             this.weights.setValue(
@@ -24,22 +24,22 @@ public class Neuron {
         }
     }
 
-    public Neuron(final double bias, final DataRow weights) {
+    public Neuron(final double bias, final DataList weights) {
         this.bias = bias;
         this.weights = weights;
     }
 
-    public double calculateOutput(final DataRow inputRow) {
-        if (this.weights.getDataRowSize() != inputRow.getDataRowSize()) {
-           throw new IllegalArgumentException("Size of input row [" + inputRow.getDataRowSize() + "] is not equal to size of weights [" + this.weights.getDataRowSize() + "]");
+    public double calculateOutput(final DataList inputRow) {
+        if (this.weights.getDataListSize() != inputRow.getDataListSize()) {
+           throw new IllegalArgumentException("Size of input row [" + inputRow.getDataListSize() + "] is not equal to size of weights [" + this.weights.getDataListSize() + "]");
         }
 
-        final double dotProduct = CustomMath.dotProduct(this.weights.getDataRowValues(), inputRow.getDataRowValues());
+        final double dotProduct = CustomMath.dotProduct(this.weights.getDataListRawValues(), inputRow.getDataListRawValues());
         return dotProduct + this.bias;
     }
 
     public int getWeightsSize() {
-        return this.weights.getDataRowSize();
+        return this.weights.getDataListSize();
     }
 
     public double getWeight(final int weightIndex) {

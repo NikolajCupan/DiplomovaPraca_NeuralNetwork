@@ -1,10 +1,10 @@
 package NeuralNetwork.ActivationFunctions;
 
-import NeuralNetwork.DataRow;
+import NeuralNetwork.DataList;
 
 public class Identity implements IActivationFunction {
     @Override
-    public DataRow apply(final DataRow inputRow) {
-        return inputRow;
+    public DataList apply(final DataList inputList) {
+        return inputList;
     }
 }

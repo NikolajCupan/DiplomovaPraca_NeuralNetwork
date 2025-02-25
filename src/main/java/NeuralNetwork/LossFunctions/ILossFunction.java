@@ -1,15 +1,15 @@
 package NeuralNetwork.LossFunctions;
 
 import NeuralNetwork.Batch;
-import NeuralNetwork.DataRow;
+import NeuralNetwork.DataList;
 
 public interface ILossFunction {
-    default DataRow calculate(final Batch predictedBatch, final Batch targetBatch) {
-        final DataRow outputRow = new DataRow(predictedBatch.getBatchSize());
+    default DataList calculate(final Batch predictedBatch, final Batch targetBatch) {
+        final DataList outputRow = new DataList(predictedBatch.getRowsSize());
 
-        for (int i = 0; i < predictedBatch.getBatchSize(); ++i) {
-            final DataRow predictedRow = predictedBatch.getDataRow(i);
-            final DataRow targetRow = targetBatch.getDataRow(i);
+        for (int i = 0; i < predictedBatch.getRowsSize(); ++i) {
+            final DataList predictedRow = predictedBatch.getRow(i);
+            final DataList targetRow = targetBatch.getRow(i);
 
             final double loss = this.calculate(predictedRow, targetRow);
             outputRow.setValue(i, loss);
@@ -18,11 +18,11 @@ public interface ILossFunction {
         return outputRow;
     }
 
-    default DataRow calculate(final Batch predictedBatch, final Integer[] targetIndexes) {
-        final DataRow outputRow = new DataRow(predictedBatch.getBatchSize());
+    default DataList calculate(final Batch predictedBatch, final Integer[] targetIndexes) {
+        final DataList outputRow = new DataList(predictedBatch.getRowsSize());
 
-        for (int i = 0; i < predictedBatch.getBatchSize(); ++i) {
-            final DataRow predictedRow = predictedBatch.getDataRow(i);
+        for (int i = 0; i < predictedBatch.getRowsSize(); ++i) {
+            final DataList predictedRow = predictedBatch.getRow(i);
             final int targetIndex = targetIndexes[i];
 
             final double loss = this.calculate(predictedRow, targetIndex);
@@ -32,6 +32,6 @@ public interface ILossFunction {
         return outputRow;
     }
 
-    double calculate(final DataRow predictedRow, final DataRow targetRow);
-    double calculate(final DataRow predictedRow, final int targetIndex);
+    double calculate(final DataList predictedRow, final DataList targetRow);
+    double calculate(final DataList predictedRow, final int targetIndex);
 }

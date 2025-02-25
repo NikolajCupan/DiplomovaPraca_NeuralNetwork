@@ -1,7 +1,7 @@
 package NeuralNetwork.ActivationFunctions;
 
-import NeuralNetwork.DataRow;
+import NeuralNetwork.DataList;
 
 public interface IActivationFunction {
-    DataRow apply(final DataRow inputRow);
+    DataList apply(final DataList inputList);
 }

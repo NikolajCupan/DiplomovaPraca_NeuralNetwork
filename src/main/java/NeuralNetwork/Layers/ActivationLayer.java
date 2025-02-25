@@ -1,17 +1,18 @@
 package NeuralNetwork.Layers;
 
 import NeuralNetwork.ActivationFunctions.IActivationFunction;
-import NeuralNetwork.DataRow;
+import NeuralNetwork.DataList;
 
-public class ActivationLayer implements ILayer {
+public class ActivationLayer extends AbstractLayer {
     private final IActivationFunction activationFunction;
 
     public ActivationLayer(final IActivationFunction activationFunction) {
+        super();
         this.activationFunction = activationFunction;
     }
 
     @Override
-    public DataRow calculateOutputRow(final DataRow inputRow) {
+    protected DataList calculateOutputRow(final DataList inputRow) {
         return this.activationFunction.apply(inputRow);
     }
 }

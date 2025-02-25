@@ -1,19 +1,19 @@
 package NeuralNetwork.ActivationFunctions;
 
-import NeuralNetwork.DataRow;
+import NeuralNetwork.DataList;
 
 public class RectifiedLinearUnit implements IActivationFunction {
     @Override
-    public DataRow apply(final DataRow inputRow) {
-        final DataRow outputRow = new DataRow(inputRow.getDataRowSize());
+    public DataList apply(final DataList inputList) {
+        final DataList outputList = new DataList(inputList.getDataListSize());
 
-        for (int i = 0; i < inputRow.getDataRowSize(); ++i) {
-            outputRow.setValue(
+        for (int i = 0; i < inputList.getDataListSize(); ++i) {
+            outputList.setValue(
                     i,
-                    Math.max(0, inputRow.getValue(i))
+                    Math.max(0, inputList.getValue(i))
             );
         }
 
-        return outputRow;
+        return outputList;
     }
 }

@@ -1,6 +1,7 @@
 package NeuralNetwork.ActivationFunctions;
 
-import NeuralNetwork.DataRow;
+import NeuralNetwork.DataList;
+import Utilities.CustomMath;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,40 +9,31 @@ import java.util.List;
 
 public class Softmax implements IActivationFunction {
     @Override
-    public DataRow apply(final DataRow inputRow) {
-        final Double[] expValues = new Double[inputRow.getDataRowSize()];
-        final double max = Softmax.getMax(inputRow);
+    public DataList apply(final DataList inputList) {
+        final Double[] expValues = new Double[inputList.getDataListSize()];
+        final double max = Softmax.getMax(inputList);
 
-        for (int i = 0; i < inputRow.getDataRowSize(); ++i) {
-            final double value = inputRow.getValue(i);
+        for (int i = 0; i < inputList.getDataListSize(); ++i) {
+            final double value = inputList.getValue(i);
             expValues[i] = Math.exp(value - max);
         }
 
-        final DataRow outputRow = new DataRow(inputRow.getDataRowSize());
-        final double sum = Softmax.getSum(expValues);
+        final DataList outputList = new DataList(inputList.getDataListSize());
+        final double sum = CustomMath.sum(expValues);
 
-        for (int i = 0; i < inputRow.getDataRowSize(); ++i) {
-            outputRow.setValue(
+        for (int i = 0; i < inputList.getDataListSize(); ++i) {
+            outputList.setValue(
                     i,
                     expValues[i] / sum
             );
         }
 
-        return outputRow;
+        return outputList;
     }
 
-    private static double getMax(final DataRow inputRow) {
-        final Double[] values = inputRow.getDataRowValues();
+    private static double getMax(final DataList inputList) {
+        final Double[] values = inputList.getDataListRawValues();
         final List<Double> list = Arrays.asList(values);
         return Collections.max(list);
-    }
-
-    private static double getSum(final Double[] inputRow) {
-        double sum = 0.0;
-        for (final Double value : inputRow) {
-            sum += value;
-        }
-
-        return sum;
     }
 }

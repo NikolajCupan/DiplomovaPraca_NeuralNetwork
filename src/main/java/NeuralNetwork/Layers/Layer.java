@@ -1,17 +1,18 @@
 package NeuralNetwork.Layers;
 
 import NeuralNetwork.Batch;
-import NeuralNetwork.DataRow;
+import NeuralNetwork.DataList;
 import NeuralNetwork.Neuron;
 import Utilities.CustomMath;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Layer implements ILayer {
+public class Layer extends AbstractLayer {
     private final List<Neuron> neurons;
 
     public Layer() {
+        super();
         this.neurons = new ArrayList<>();
     }
 
@@ -27,40 +28,73 @@ public class Layer implements ILayer {
         this.neurons.add(neuron);
     }
 
-    public Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
+    public Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
-        for (int i = 0; i < inputGradientBatch.getBatchSize(); ++i) {
-            final DataRow inputGradientRow = inputGradientBatch.getDataRow(i);
-            outputGradientBatch.addDataRow(this.calculateGradientWithRespectToInputs(inputGradientRow));
+        for (int i = 0; i < inputGradientBatch.getColumnsSize(); ++i) {
+            final DataList inputGradientColumn = inputGradientBatch.getColumn(i);
+            outputGradientBatch.addRow(this.calculateGradientWithRespectToWeights(inputGradientColumn));
         }
 
         return outputGradientBatch;
     }
 
-    public DataRow calculateGradientWithRespectToInputs(final DataRow inputGradient) {
+    private DataList calculateGradientWithRespectToWeights(final DataList inputGradient) {
         final int neuronsSize = this.neurons.size();
-        if (neuronsSize != inputGradient.getDataRowSize()) {
-            throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataRowSize() + "] is not equal to neurons size [" + neuronsSize + "]");
+        if (neuronsSize != inputGradient.getDataListSize()) {
+            throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataListSize() + "] is not equal to neurons size [" + neuronsSize + "]");
         }
 
         // Number of connections between one neuron in current layer and all inputs from previous layer
-        final int weightsSize = this.neurons.getFirst().getWeightsSize();
+        final int inputsRowSize = this.getInputsRowSize();
 
-        final DataRow outputGradient = new DataRow(weightsSize);
+        final DataList outputGradient = new DataList(inputsRowSize);
 
-        for (int inputIndex = 0; inputIndex < weightsSize; ++inputIndex) {
-            final DataRow inputConnectionWeights = this.getWeights(inputIndex);
+        for (int inputIndex = 0; inputIndex < inputsRowSize; ++inputIndex) {
+            final DataList inputs = this.getInputs(inputIndex);
             outputGradient.setValue(
                     inputIndex,
-                    CustomMath.dotProduct(inputGradient.getDataRowValues(), inputConnectionWeights.getDataRowValues())
+                    CustomMath.dotProduct(inputs.getDataListRawValues(), inputGradient.getDataListRawValues())
             );
         }
 
         return outputGradient;
     }
 
-    private DataRow getWeights(final int inputIndex) {
+    public Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
+        final Batch outputGradientBatch = new Batch();
+
+        for (int i = 0; i < inputGradientBatch.getRowsSize(); ++i) {
+            final DataList inputGradientRow = inputGradientBatch.getRow(i);
+            outputGradientBatch.addRow(this.calculateGradientWithRespectToInputs(inputGradientRow));
+        }
+
+        return outputGradientBatch;
+    }
+
+    private DataList calculateGradientWithRespectToInputs(final DataList inputGradient) {
+        final int neuronsSize = this.neurons.size();
+        if (neuronsSize != inputGradient.getDataListSize()) {
+            throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataListSize() + "] is not equal to neurons size [" + neuronsSize + "]");
+        }
+
+        // Number of connections between one neuron in current layer and all inputs from previous layer
+        final int weightsSize = this.neurons.getFirst().getWeightsSize();
+
+        final DataList outputGradient = new DataList(weightsSize);
+
+        for (int weightIndex = 0; weightIndex < weightsSize; ++weightIndex) {
+            final DataList inputConnectionWeights = this.getWeights(weightIndex);
+            outputGradient.setValue(
+                    weightIndex,
+                    CustomMath.dotProduct(inputGradient.getDataListRawValues(), inputConnectionWeights.getDataListRawValues())
+            );
+        }
+
+        return outputGradient;
+    }
+
+    private DataList getWeights(final int inputIndex) {
         if (this.neurons.isEmpty()) {
             throw new IllegalArgumentException("Neuron list is empty");
         }
@@ -75,7 +109,7 @@ public class Layer implements ILayer {
         }
 
         // Weights associated with the input
-        final DataRow weights = new DataRow(connectionsSize);
+        final DataList weights = new DataList(connectionsSize);
 
         for (int neuronIndex = 0; neuronIndex < connectionsSize; ++neuronIndex) {
             final Neuron neuron = this.neurons.get(neuronIndex);
@@ -88,8 +122,8 @@ public class Layer implements ILayer {
     }
 
     @Override
-    public DataRow calculateOutputRow(final DataRow inputRow) {
-        final DataRow outputRow = new DataRow(this.neurons.size());
+    protected DataList calculateOutputRow(final DataList inputRow) {
+        final DataList outputRow = new DataList(this.neurons.size());
 
         for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
             final double neuronOutput = this.neurons.get(neuronIndex).calculateOutput(inputRow);

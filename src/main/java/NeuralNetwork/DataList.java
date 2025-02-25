@@ -2,18 +2,18 @@ package NeuralNetwork;
 
 import Utilities.Helper;
 
-public class DataRow {
+public class DataList {
     private final Double[] dataValues;
 
-    public DataRow(final int size) {
+    public DataList(final int size) {
         this.dataValues = new Double[size];
     }
 
-    public DataRow(final Double[] dataValues) {
+    public DataList(final Double[] dataValues) {
         this.dataValues = dataValues;
     }
 
-    public int getDataRowSize() {
+    public int getDataListSize() {
         return this.dataValues.length;
     }
 
@@ -21,7 +21,7 @@ public class DataRow {
         return this.dataValues.length == 0;
     }
 
-    public Double[] getDataRowValues() {
+    public Double[] getDataListRawValues() {
         return this.dataValues;
     }
 
