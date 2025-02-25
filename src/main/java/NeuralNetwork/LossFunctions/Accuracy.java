@@ -3,16 +3,14 @@ package NeuralNetwork.LossFunctions;
 import NeuralNetwork.DataRow;
 import Utilities.CustomMath;
 
-public class CategoricalCrossEntropy implements ILossFunction {
-    private static final double CLAMP_VALUE = 0.0000001;
-
+public class Accuracy implements ILossFunction {
     @Override
     public double calculate(final DataRow predictedRow, final DataRow targetRow) {
         final int targetRowArgMax = CustomMath.argMax(targetRow);
 
         final double targetRowMax = targetRow.getValue(targetRowArgMax);
         if (Math.abs(1.0 - targetRowMax) > 0.0) {
-            throw new IllegalArgumentException("Categorical cross entropy requires one-hot target data row");
+            throw new IllegalArgumentException("Accuracy requires one-hot target data row");
         }
 
         return this.calculate(predictedRow, targetRowArgMax);
@@ -20,9 +18,12 @@ public class CategoricalCrossEntropy implements ILossFunction {
 
     @Override
     public double calculate(final DataRow predictedRow, final int targetIndex) {
-        final double predictedValue = predictedRow.getValue(targetIndex);
-        final double clampedValue = CustomMath.clamp(predictedValue, CLAMP_VALUE, 1.0 - CLAMP_VALUE);
+        final int predictedRowArgMax = CustomMath.argMax(predictedRow);
 
-        return -Math.log(clampedValue);
+        if (predictedRowArgMax == targetIndex) {
+            return 1.0;
+        } else {
+            return 0.0;
+        }
     }
 }

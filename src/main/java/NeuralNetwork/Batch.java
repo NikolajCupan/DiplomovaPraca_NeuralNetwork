@@ -12,7 +12,7 @@ public class Batch {
 
     public void addInputRow(final DataRow inputRow) {
         if (!this.batch.isEmpty()) {
-            final long inputRowSize = this.batch.getLast().getDataRowSize();
+            final int inputRowSize = this.batch.getLast().getDataRowSize();
 
             if (inputRow.getDataRowSize() != inputRowSize) {
                 throw new IllegalArgumentException(

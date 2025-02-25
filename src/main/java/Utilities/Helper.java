@@ -1,7 +1,7 @@
 package Utilities;
 
 public class Helper {
-    private static final long DECIMAL_POINTS_PRINTED = 3;
+    private static final int DECIMAL_POINTS_PRINTED = 3;
 
     public static <T extends Number> String stringifyArray(final T[] array) {
         final StringBuilder builder = new StringBuilder();

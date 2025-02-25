@@ -1,5 +1,6 @@
 package Utilities;
 
+import NeuralNetwork.Batch;
 import NeuralNetwork.DataRow;
 
 public class CustomMath {
@@ -37,5 +38,44 @@ public class CustomMath {
         }
 
         return maxIndex;
+    }
+
+    public static DataRow mean(final Batch batch) {
+        final DataRow outputRow = new DataRow(batch.getBatchSize());
+
+        for (int i = 0; i < batch.getBatchSize(); ++i) {
+            final DataRow inputRow = batch.getInputRow(i);
+            final double inputRowMean = CustomMath.mean(inputRow);
+
+            outputRow.setValue(i, inputRowMean);
+        }
+
+        return outputRow;
+    }
+
+    public static double mean(final DataRow dataRow) {
+        if (dataRow.isEmpty()) {
+            throw new IllegalArgumentException("Data row is empty");
+        }
+
+        final double sum = CustomMath.sum(dataRow);
+        final double size = dataRow.getDataRowSize();
+
+        return sum / size;
+    }
+
+    public static double sum(final DataRow dataRow) {
+        double sum = 0.0;
+
+        final Double[] dataRowValues = dataRow.getDataRowValues();
+        for (final Double dataRowValue : dataRowValues) {
+            sum += dataRowValue;
+        }
+
+        return sum;
+    }
+
+    public static double clamp(final double value, final double min, final double max) {
+        return Math.max(min, Math.min(max, value));
     }
 }
