@@ -3,23 +3,13 @@ package Utilities;
 import java.util.Random;
 
 public class SeedGenerator {
-    private static boolean INITIALIZED = false;
-    private static Random RANDOM;
+    private final Random random;
 
-    public static void initialize(final long seed) {
-        if (SeedGenerator.INITIALIZED) {
-            throw new IllegalStateException("Seed generator is already initialized");
-        }
-
-        SeedGenerator.RANDOM = new Random(seed);
-        SeedGenerator.INITIALIZED = true;
+    public SeedGenerator(final long seed) {
+        this.random = new Random(seed);
     }
 
-    public static long getSeed() {
-        if (!SeedGenerator.INITIALIZED) {
-            throw new IllegalArgumentException("Seed generator is not initialized");
-        }
-
-        return SeedGenerator.RANDOM.nextLong();
+    public long getSeed() {
+        return this.random.nextLong();
     }
 }

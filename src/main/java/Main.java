@@ -5,19 +5,22 @@ import NeuralNetwork.DataRow;
 import NeuralNetwork.Layers.ActivationLayer;
 import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.Neuron;
+import Utilities.SeedGenerator;
 
 public class Main {
+    private static final SeedGenerator SEED_GENERATOR = new SeedGenerator(420);
+
     public static Layer getLayer1() {
         final Neuron neuron1 = new Neuron(
-                2.0, new Double[]{ 0.2, 0.8, -0.5, 1.0 }
+                4, Main.SEED_GENERATOR.getSeed()
         );
 
         final Neuron neuron2 = new Neuron(
-                3.0, new Double[]{ 0.5, -0.91, 0.26, -0.5 }
+                4, Main.SEED_GENERATOR.getSeed()
         );
 
         final Neuron neuron3 = new Neuron(
-                0.5, new Double[]{ -0.26, -0.27, 0.17, 0.87 }
+                4, Main.SEED_GENERATOR.getSeed()
         );
 
         final Layer layer = new Layer();
@@ -36,15 +39,15 @@ public class Main {
 
     public static Layer getLayer2() {
         final Neuron neuron1 = new Neuron(
-                -1.0, new Double[]{ 0.1, -0.14, 0.5 }
+                3, Main.SEED_GENERATOR.getSeed()
         );
 
         final Neuron neuron2 = new Neuron(
-                2.0, new Double[]{ -0.5, 0.12, -0.33 }
+                3, Main.SEED_GENERATOR.getSeed()
         );
 
         final Neuron neuron3 = new Neuron(
-                -0.5, new Double[]{ -0.44, 0.73, -0.13 }
+                3, Main.SEED_GENERATOR.getSeed()
         );
 
         final Layer layer = new Layer();

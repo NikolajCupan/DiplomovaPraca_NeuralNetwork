@@ -17,6 +17,10 @@ public class DataRow {
         return this.dataValues.length;
     }
 
+    public boolean isEmpty() {
+        return this.dataValues.length == 0;
+    }
+
     public Double[] getDataRowValues() {
         return this.dataValues;
     }

@@ -26,12 +26,12 @@ public class Neuron {
         this.weights = weights;
     }
 
-    public double calculateOutput(final DataRow inputRow) {
+    public Double calculateOutput(final DataRow inputRow) {
         if (this.weights.length != inputRow.getDataRowSize()) {
            throw new IllegalArgumentException("Size of input row [" + inputRow.getDataRowSize() + "] is not equal to size of weights [" + this.weights.length + "]");
         }
 
-        final double dotProduct = CustomMath.dotProduct(this.weights, inputRow.getDataRowValues());
+        final Double dotProduct = CustomMath.dotProduct(this.weights, inputRow.getDataRowValues());
         return dotProduct + this.bias;
     }
 
