@@ -44,7 +44,7 @@ public class CustomMath {
         final DataRow outputRow = new DataRow(batch.getBatchSize());
 
         for (int i = 0; i < batch.getBatchSize(); ++i) {
-            final DataRow inputRow = batch.getInputRow(i);
+            final DataRow inputRow = batch.getDataRow(i);
             final double inputRowMean = CustomMath.mean(inputRow);
 
             outputRow.setValue(i, inputRowMean);

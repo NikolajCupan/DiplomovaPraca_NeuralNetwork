@@ -10,25 +10,25 @@ public class Batch {
         this.batch = new ArrayList<>();
     }
 
-    public void addInputRow(final DataRow inputRow) {
+    public void addDataRow(final DataRow dataRow) {
         if (!this.batch.isEmpty()) {
-            final int inputRowSize = this.batch.getLast().getDataRowSize();
+            final int dataRowSize = this.batch.getLast().getDataRowSize();
 
-            if (inputRow.getDataRowSize() != inputRowSize) {
+            if (dataRow.getDataRowSize() != dataRowSize) {
                 throw new IllegalArgumentException(
-                        "New input row size [" + inputRow.getDataRowSize() + "] is not equal to current input row size [" + inputRowSize + "]"
+                        "New data row size [" + dataRow.getDataRowSize() + "] is not equal to current data row size [" + dataRowSize + "]"
                 );
             }
         }
 
-        this.batch.add(inputRow);
+        this.batch.add(dataRow);
     }
 
-    public DataRow getInputRow(final int index) {
+    public DataRow getDataRow(final int index) {
         return this.batch.get(index);
     }
 
-    // Number of input rows currently in batch
+    // Number of data rows currently in batch
     public int getBatchSize() {
         return this.batch.size();
     }

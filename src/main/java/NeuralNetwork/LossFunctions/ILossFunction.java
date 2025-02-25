@@ -8,8 +8,8 @@ public interface ILossFunction {
         final DataRow outputRow = new DataRow(predictedBatch.getBatchSize());
 
         for (int i = 0; i < predictedBatch.getBatchSize(); ++i) {
-            final DataRow predictedRow = predictedBatch.getInputRow(i);
-            final DataRow targetRow = targetBatch.getInputRow(i);
+            final DataRow predictedRow = predictedBatch.getDataRow(i);
+            final DataRow targetRow = targetBatch.getDataRow(i);
 
             final double loss = this.calculate(predictedRow, targetRow);
             outputRow.setValue(i, loss);
@@ -22,7 +22,7 @@ public interface ILossFunction {
         final DataRow outputRow = new DataRow(predictedBatch.getBatchSize());
 
         for (int i = 0; i < predictedBatch.getBatchSize(); ++i) {
-            final DataRow predictedRow = predictedBatch.getInputRow(i);
+            final DataRow predictedRow = predictedBatch.getDataRow(i);
             final int targetIndex = targetIndexes[i];
 
             final double loss = this.calculate(predictedRow, targetIndex);

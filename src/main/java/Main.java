@@ -1,17 +1,17 @@
+import NeuralNetwork.DataRow;
 import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.Neuron;
-import Utilities.Helper;
 
 public class Main {
     public static Layer getLayer() {
         final Neuron neuron1 = new Neuron(
-                1.0, new Double[]{ 0.2, 0.8, -0.5, 1.0 }
+                1.0, new DataRow(new Double[]{ 0.2, 0.8, -0.5, 1.0 })
         );
         final Neuron neuron2 = new Neuron(
-                1.0, new Double[]{ 0.5, -0.91, 0.26, -0.5 }
+                1.0, new DataRow(new Double[]{ 0.5, -0.91, 0.26, -0.5 })
         );
         final Neuron neuron3 = new Neuron(
-                1.0, new Double[]{ -0.26, -0.27, 0.17, 0.87 }
+                1.0, new DataRow(new Double[]{ -0.26, -0.27, 0.17, 0.87 })
         );
 
         final Layer layer = new Layer();
@@ -23,10 +23,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        final Double[] gradient = new Double[]{ 1.0, 1.0, 1.0 };
+        final DataRow inputGradient = new DataRow(new Double[]{ 1.0, 1.0, 1.0 });
         final Layer layer = getLayer();
 
-        final Double[] newGradient = layer.calculateGradient(gradient);
-        System.out.println(Helper.stringifyArray(newGradient));
+        final DataRow outputGradient = layer.calculateGradient(inputGradient);
+        System.out.println(outputGradient);
     }
 }

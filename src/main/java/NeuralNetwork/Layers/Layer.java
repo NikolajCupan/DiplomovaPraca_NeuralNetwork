@@ -26,26 +26,29 @@ public class Layer implements ILayer {
         this.neurons.add(neuron);
     }
 
-    public Double[] calculateGradient(final Double[] gradient) {
+    public DataRow calculateGradient(final DataRow inputGradient) {
         final int neuronsSize = this.neurons.size();
-        if (neuronsSize != gradient.length) {
-            throw new IllegalArgumentException("Gradient size [" + gradient.length + "] is not equal to neurons size [" + neuronsSize + "]");
+        if (neuronsSize != inputGradient.getDataRowSize()) {
+            throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataRowSize() + "] is not equal to neurons size [" + neuronsSize + "]");
         }
 
         // Number of connections between one neuron in current layer and all inputs from previous layer
         final int weightsSize = this.neurons.getFirst().getWeightsSize();
 
-        final Double[] newGradient = new Double[weightsSize];
+        final DataRow outputGradient = new DataRow(weightsSize);
 
         for (int inputIndex = 0; inputIndex < weightsSize; ++inputIndex) {
-            final Double[] inputConnectionWeights = this.getWeights(inputIndex);
-            newGradient[inputIndex] = CustomMath.dotProduct(gradient, inputConnectionWeights);
+            final DataRow inputConnectionWeights = this.getWeights(inputIndex);
+            outputGradient.setValue(
+                    inputIndex,
+                    CustomMath.dotProduct(inputGradient.getDataRowValues(), inputConnectionWeights.getDataRowValues())
+            );
         }
 
-        return newGradient;
+        return outputGradient;
     }
 
-    private Double[] getWeights(final int inputIndex) {
+    private DataRow getWeights(final int inputIndex) {
         if (this.neurons.isEmpty()) {
             throw new IllegalArgumentException("Neuron list is empty");
         }
@@ -60,13 +63,13 @@ public class Layer implements ILayer {
         }
 
         // Weights associated with the input
-        final Double[] weights = new Double[connectionsSize];
+        final DataRow weights = new DataRow(connectionsSize);
 
         for (int neuronIndex = 0; neuronIndex < connectionsSize; ++neuronIndex) {
             final Neuron neuron = this.neurons.get(neuronIndex);
             final double weight = neuron.getWeight(inputIndex);
 
-            weights[neuronIndex] = weight;
+            weights.setValue(neuronIndex, weight);
         }
 
         return weights;
