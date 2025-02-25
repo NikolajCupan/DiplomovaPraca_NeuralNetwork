@@ -41,7 +41,7 @@ public class Main {
         final Batch batch = new Batch();
 
         final DataList gradientRow1 = new DataList(new Double[]{ 1.0, 1.0, 1.0 });
-        final DataList gradientRow2 = new DataList(new Double[]{ 2.0, 5.0, 8.0 });
+        final DataList gradientRow2 = new DataList(new Double[]{ 2.0, 2.0, 2.0 });
         final DataList gradientRow3 = new DataList(new Double[]{ 3.0, 3.0, 3.0 });
 
         batch.addRow(gradientRow1);
@@ -53,11 +53,11 @@ public class Main {
 
     public static void main(String[] args) {
         final Layer layer = Main.getLayer();
-        final Batch inputDataBatch = Main.getInputDataBatch();
-        final Batch inputGradientBatch = Main.getInputGradientBatch();
+        final Batch gradient = Main.getInputGradientBatch();
+        final Batch data = Main.getInputDataBatch();
 
-        layer.calculateOutputBatch(inputDataBatch);
-        final Batch outputGradientBatch = layer.calculateGradientWithRespectToWeights(inputGradientBatch);
-        System.out.println(outputGradientBatch);
+        layer.calculateOutputBatch(data);
+        final var res = layer.calculateGradientWithRespectToWeights(gradient);
+        System.out.println(res);
     }
 }

@@ -18,7 +18,7 @@ public class Layer extends AbstractLayer {
 
     public void addNeuron(final Neuron neuron) {
         if (!this.neurons.isEmpty()) {
-            final int weightsSize = this.neurons.getLast().getWeightsSize();
+            final int weightsSize = this.neurons.getFirst().getWeightsSize();
 
             if (neuron.getWeightsSize() != weightsSize) {
                 throw new IllegalArgumentException("New neuron weights size [" + neuron.getWeightsSize() + "] is not equal to current weights size [" + weightsSize + "]");
@@ -31,34 +31,30 @@ public class Layer extends AbstractLayer {
     public Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
-        for (int i = 0; i < inputGradientBatch.getColumnsSize(); ++i) {
-            final DataList inputGradientColumn = inputGradientBatch.getColumn(i);
-            outputGradientBatch.addRow(this.calculateGradientWithRespectToWeights(inputGradientColumn));
+        final Batch inputBatch = this.getInputBatch();
+        final int inputBatchColumnsSize = inputBatch.getColumnsSize();
+
+        final int inputGradientColumnsSize = inputGradientBatch.getColumnsSize();
+
+        for (int inputColumnIndex = 0; inputColumnIndex < inputBatchColumnsSize; ++inputColumnIndex) {
+            final DataList inputBatchColumn = inputBatch.getColumn(inputColumnIndex);
+
+            final DataList resultRow = new DataList(inputGradientColumnsSize);
+
+            for (int inputGradientIndex = 0; inputGradientIndex < inputGradientColumnsSize; ++inputGradientIndex) {
+                final DataList inputGradientColumn = inputGradientBatch.getColumn(inputGradientIndex);
+
+                final double result = CustomMath.dotProduct(inputGradientColumn.getDataListRawValues(), inputBatchColumn.getDataListRawValues());
+                resultRow.setValue(
+                        inputGradientIndex,
+                        result
+                );
+            }
+
+            outputGradientBatch.addRow(resultRow);
         }
 
         return outputGradientBatch;
-    }
-
-    private DataList calculateGradientWithRespectToWeights(final DataList inputGradient) {
-        final int neuronsSize = this.neurons.size();
-        if (neuronsSize != inputGradient.getDataListSize()) {
-            throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataListSize() + "] is not equal to neurons size [" + neuronsSize + "]");
-        }
-
-        // Number of connections between one neuron in current layer and all inputs from previous layer
-        final int inputsRowSize = this.getInputsRowSize();
-
-        final DataList outputGradient = new DataList(inputsRowSize);
-
-        for (int inputIndex = 0; inputIndex < inputsRowSize; ++inputIndex) {
-            final DataList inputs = this.getInputs(inputIndex);
-            outputGradient.setValue(
-                    inputIndex,
-                    CustomMath.dotProduct(inputs.getDataListRawValues(), inputGradient.getDataListRawValues())
-            );
-        }
-
-        return outputGradient;
     }
 
     public Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
@@ -83,18 +79,18 @@ public class Layer extends AbstractLayer {
 
         final DataList outputGradient = new DataList(weightsSize);
 
-        for (int weightIndex = 0; weightIndex < weightsSize; ++weightIndex) {
-            final DataList inputConnectionWeights = this.getWeights(weightIndex);
+        for (int columnIndex = 0; columnIndex < weightsSize; ++columnIndex) {
+            final DataList columnWeights = this.getColumnWeights(columnIndex);
             outputGradient.setValue(
-                    weightIndex,
-                    CustomMath.dotProduct(inputGradient.getDataListRawValues(), inputConnectionWeights.getDataListRawValues())
+                    columnIndex,
+                    CustomMath.dotProduct(inputGradient.getDataListRawValues(), columnWeights.getDataListRawValues())
             );
         }
 
         return outputGradient;
     }
 
-    private DataList getWeights(final int inputIndex) {
+    private DataList getColumnWeights(final int columnIndex) {
         if (this.neurons.isEmpty()) {
             throw new IllegalArgumentException("Neuron list is empty");
         }
@@ -102,23 +98,16 @@ public class Layer extends AbstractLayer {
         // Number of connections between one input from previous layer and all neurons in current layer
         final int connectionsSize = this.neurons.size();
 
-        // Number of connections between one neuron in current layer and all inputs from previous layer
-        final int weightsSize = this.neurons.getFirst().getWeightsSize();
-        if (inputIndex >= weightsSize) {
-            throw new IllegalArgumentException("Input index [" + inputIndex + "] is invalid, weights size [" + weightsSize + "]");
+        final DataList columnWeights = new DataList(connectionsSize);
+
+        for (int rowIndex = 0; rowIndex < connectionsSize; ++rowIndex) {
+            final Neuron neuron = this.neurons.get(rowIndex);
+            final double weight = neuron.getWeight(columnIndex);
+
+            columnWeights.setValue(rowIndex, weight);
         }
 
-        // Weights associated with the input
-        final DataList weights = new DataList(connectionsSize);
-
-        for (int neuronIndex = 0; neuronIndex < connectionsSize; ++neuronIndex) {
-            final Neuron neuron = this.neurons.get(neuronIndex);
-            final double weight = neuron.getWeight(inputIndex);
-
-            weights.setValue(neuronIndex, weight);
-        }
-
-        return weights;
+        return columnWeights;
     }
 
     @Override

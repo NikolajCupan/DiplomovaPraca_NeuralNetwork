@@ -6,17 +6,17 @@ import NeuralNetwork.DataList;
 import java.util.Optional;
 
 public abstract class AbstractLayer {
-    private Optional<Batch> processedInputBatch;
+    private Optional<Batch> savedInputBatch;
 
     protected AbstractLayer() {
-        this.processedInputBatch = Optional.empty();
+        this.savedInputBatch = Optional.empty();
     }
 
     public Batch calculateOutputBatch(final Batch inputBatch) {
-        if (this.processedInputBatch.isPresent()) {
+        if (this.savedInputBatch.isPresent()) {
             throw new IllegalArgumentException("Layer already processed an input batch");
         }
-        this.processedInputBatch = Optional.of(inputBatch);
+        this.savedInputBatch = Optional.of(inputBatch);
 
         final Batch outputBatch = new Batch();
 
@@ -30,28 +30,12 @@ public abstract class AbstractLayer {
         return outputBatch;
     }
 
-    public DataList getInputs(final int inputIndex) {
-        if (this.processedInputBatch.isEmpty()) {
+    protected Batch getInputBatch() {
+        if (this.savedInputBatch.isEmpty()) {
             throw new IllegalArgumentException("Layer has not processed an input batch yet");
         }
 
-        final int batchSize = this.processedInputBatch.get().getRowsSize();
-        final DataList inputs = new DataList(batchSize);
-
-        for (int i = 0; i < batchSize; ++i) {
-            final DataList inputRow = this.processedInputBatch.get().getRow(i);
-            inputs.setValue(i, inputRow.getValue(inputIndex));
-        }
-
-        return inputs;
-    }
-
-    public int getInputsRowSize() {
-        if (this.processedInputBatch.isEmpty()) {
-            throw new IllegalArgumentException("Layer has not processed an input batch yet");
-        }
-
-        return this.processedInputBatch.get().getRow(0).getDataListSize();
+        return this.savedInputBatch.get();
     }
 
     protected abstract DataList calculateOutputRow(final DataList inputRow);
