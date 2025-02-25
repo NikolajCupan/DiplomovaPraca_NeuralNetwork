@@ -27,18 +27,18 @@ public class Layer implements ILayer {
         this.neurons.add(neuron);
     }
 
-    public Batch calculateGradient(final Batch inputGradientBatch) {
+    public Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
         for (int i = 0; i < inputGradientBatch.getBatchSize(); ++i) {
             final DataRow inputGradientRow = inputGradientBatch.getDataRow(i);
-            outputGradientBatch.addDataRow(this.calculateGradient(inputGradientRow));
+            outputGradientBatch.addDataRow(this.calculateGradientWithRespectToInputs(inputGradientRow));
         }
 
         return outputGradientBatch;
     }
 
-    public DataRow calculateGradient(final DataRow inputGradient) {
+    public DataRow calculateGradientWithRespectToInputs(final DataRow inputGradient) {
         final int neuronsSize = this.neurons.size();
         if (neuronsSize != inputGradient.getDataRowSize()) {
             throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataRowSize() + "] is not equal to neurons size [" + neuronsSize + "]");

@@ -41,7 +41,7 @@ public class Main {
         final Layer layer = Main.getLayer();
         final Batch inputGradientBatch = Main.getInputGradientBatch();
 
-        final Batch outputGradientBatch = layer.calculateGradient(inputGradientBatch);
+        final Batch outputGradientBatch = layer.calculateGradientWithRespectToInputs(inputGradientBatch);
         System.out.println(outputGradientBatch);
     }
 }
