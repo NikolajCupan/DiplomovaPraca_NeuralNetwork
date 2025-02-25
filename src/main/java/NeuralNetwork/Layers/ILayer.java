@@ -4,11 +4,11 @@ import NeuralNetwork.Batch;
 import NeuralNetwork.DataRow;
 
 public interface ILayer {
-    default Batch calculateOutputBatch(final Batch batch) {
+    default Batch calculateOutputBatch(final Batch inputBatch) {
         final Batch outputBatch = new Batch();
 
-        for (int i = 0; i < batch.getBatchSize(); ++i) {
-            final DataRow inputRow = batch.getDataRow(i);
+        for (int i = 0; i < inputBatch.getBatchSize(); ++i) {
+            final DataRow inputRow = inputBatch.getDataRow(i);
             final DataRow calculatedRow = this.calculateOutputRow(inputRow);
 
             outputBatch.addDataRow(calculatedRow);

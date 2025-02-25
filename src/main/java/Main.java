@@ -1,3 +1,4 @@
+import NeuralNetwork.Batch;
 import NeuralNetwork.DataRow;
 import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.Neuron;
@@ -22,11 +23,25 @@ public class Main {
         return layer;
     }
 
-    public static void main(String[] args) {
-        final DataRow inputGradient = new DataRow(new Double[]{ 1.0, 1.0, 1.0 });
-        final Layer layer = getLayer();
+    public static Batch getInputGradientBatch() {
+        final Batch batch = new Batch();
 
-        final DataRow outputGradient = layer.calculateGradient(inputGradient);
-        System.out.println(outputGradient);
+        final DataRow gradientRow1 = new DataRow(new Double[]{ 1.0, 1.0, 1.0 });
+        final DataRow gradientRow2 = new DataRow(new Double[]{ 2.0, 2.0, 2.0 });
+        final DataRow gradientRow3 = new DataRow(new Double[]{ 3.0, 3.0, 3.0 });
+
+        batch.addDataRow(gradientRow1);
+        batch.addDataRow(gradientRow2);
+        batch.addDataRow(gradientRow3);
+
+        return batch;
+    }
+
+    public static void main(String[] args) {
+        final Layer layer = Main.getLayer();
+        final Batch inputGradientBatch = Main.getInputGradientBatch();
+
+        final Batch outputGradientBatch = layer.calculateGradient(inputGradientBatch);
+        System.out.println(outputGradientBatch);
     }
 }
