@@ -28,6 +28,23 @@ public class Layer extends AbstractLayer {
         this.neurons.add(neuron);
     }
 
+    public Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch) {
+        final int inputGradientColumnsSize = inputGradientBatch.getColumnsSize();
+        final DataList gradients = new DataList(inputGradientColumnsSize);
+
+        for (int columnIndex = 0; columnIndex < inputGradientColumnsSize; ++columnIndex) {
+            final DataList gradientColumn = inputGradientBatch.getColumn(columnIndex);
+            gradients.setValue(
+                    columnIndex,
+                    CustomMath.sum(gradientColumn)
+            );
+        }
+
+        final Batch gradientBatch = new Batch();
+        gradientBatch.addRow(gradients);
+        return gradientBatch;
+    }
+
     public Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
