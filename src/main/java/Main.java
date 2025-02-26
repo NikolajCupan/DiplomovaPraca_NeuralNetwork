@@ -1,5 +1,7 @@
+import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
+import NeuralNetwork.Layers.ActivationLayer;
 import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.Neuron;
 
@@ -23,7 +25,13 @@ public class Main {
         return layer;
     }
 
-    public static Batch getInputDataBatch() {
+    public static ActivationLayer getActivationLayer() {
+        return new ActivationLayer(
+                new RectifiedLinearUnit()
+        );
+    }
+
+    public static Batch getInput() {
         final Batch batch = new Batch();
 
         final DataList input1 = new DataList(new Double[]{ 1.0, 2.0, 3.0, 2.5 });
@@ -37,12 +45,13 @@ public class Main {
         return batch;
     }
 
-    public static Batch getInputGradientBatch() {
+    public static Batch getGradient() {
         final Batch batch = new Batch();
 
-        final DataList gradientRow1 = new DataList(new Double[]{ 1.0, 2.0, 1.0 });
-        final DataList gradientRow2 = new DataList(new Double[]{ 2.0, 3.0, 2.0 });
+        final DataList gradientRow1 = new DataList(new Double[]{ 1.0, 1.0, 1.0 });
+        final DataList gradientRow2 = new DataList(new Double[]{ 2.0, 2.0, 2.0 });
         final DataList gradientRow3 = new DataList(new Double[]{ 3.0, 3.0, 3.0 });
+
         batch.addRow(gradientRow1);
         batch.addRow(gradientRow2);
         batch.addRow(gradientRow3);
@@ -52,10 +61,29 @@ public class Main {
 
     public static void main(String[] args) {
         final Layer layer = Main.getLayer();
-        final Batch gradient = Main.getInputGradientBatch();
-        final Batch data = Main.getInputDataBatch();
+        final ActivationLayer activationLayer = Main.getActivationLayer();
 
-        final var res = layer.calculateGradientWithRespectToBiases(gradient);
-        System.out.println(res);
+        final Batch input = Main.getInput();
+        final Batch gradient = Main.getGradient();
+
+        final Batch layerOutput = layer.calculateOutputBatch(input);
+        final Batch activationLayerOutput = activationLayer.calculateOutputBatch(layerOutput);
+
+        final Batch reluGradient = activationLayer.calculateGradientWithRespectToInputs(null);
+
+        final Batch gradientWRTInputs = layer.calculateGradientWithRespectToInputs(reluGradient);
+        final Batch gradientWRTWeights = layer.calculateGradientWithRespectToWeights(reluGradient);
+        final Batch gradientWRTBiases = layer.calculateGradientWithRespectToBiases(reluGradient);
+
+        System.out.println(layer);
+
+        //System.out.println(gradientWRTInputs);
+        System.out.println(gradientWRTWeights);
+        //System.out.println(gradientWRTBiases);
+
+        layer.updateBiases(gradientWRTBiases);
+        layer.updateWeights(gradientWRTWeights);
+
+        System.out.println(layer);
     }
 }

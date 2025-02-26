@@ -28,6 +28,32 @@ public class Layer extends AbstractLayer {
         this.neurons.add(neuron);
     }
 
+    public void updateBiases(final Batch gradientBatch) {
+        if (this.neurons.size() != gradientBatch.getColumnsSize()) {
+            throw new RuntimeException("Unable to update biases, neurons size [" + this.neurons.size() + "] is not equal to gradient column size [" + gradientBatch.getColumnsSize() + "]");
+        }
+
+        final DataList gradientRow = gradientBatch.getRow(0);
+        for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
+            this.neurons.get(neuronIndex).updateBias(gradientRow.getValue(neuronIndex));
+        }
+    }
+
+    public void updateWeights(final Batch gradientBatch) {
+        if (gradientBatch.getColumnsSize() != this.neurons.size()) {
+            throw new IllegalArgumentException("Unable to update weights, neurons size [" + this.neurons.size() + "] is not equal to gradient column size [ " + gradientBatch.getColumnsSize() + "]");
+        } else if (gradientBatch.getRowsSize() != this.neurons.getFirst().getWeightsSize()) {
+            throw new IllegalArgumentException("Unable to update weights, weights size [" + this.neurons.getFirst().getWeightsSize() + "] is not equal to gradient row size [ " + gradientBatch.getRowsSize() + "]");
+        }
+
+        for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
+            final Neuron neuron = this.neurons.get(neuronIndex);
+            final DataList gradientColumn = gradientBatch.getColumn(neuronIndex);
+
+            neuron.updateWeights(gradientColumn);
+        }
+    }
+
     public Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch) {
         final int inputGradientColumnsSize = inputGradientBatch.getColumnsSize();
         final DataList gradients = new DataList(inputGradientColumnsSize);
@@ -74,18 +100,20 @@ public class Layer extends AbstractLayer {
         return outputGradientBatch;
     }
 
+    @Override
     public Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
-        for (int i = 0; i < inputGradientBatch.getRowsSize(); ++i) {
-            final DataList inputGradientRow = inputGradientBatch.getRow(i);
+        for (int rowIndex = 0; rowIndex < inputGradientBatch.getRowsSize(); ++rowIndex) {
+            final DataList inputGradientRow = inputGradientBatch.getRow(rowIndex);
             outputGradientBatch.addRow(this.calculateGradientWithRespectToInputs(inputGradientRow));
         }
 
         return outputGradientBatch;
     }
 
-    private DataList calculateGradientWithRespectToInputs(final DataList inputGradient) {
+    @Override
+    protected DataList calculateGradientWithRespectToInputs(final DataList inputGradient) {
         final int neuronsSize = this.neurons.size();
         if (neuronsSize != inputGradient.getDataListSize()) {
             throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataListSize() + "] is not equal to neurons size [" + neuronsSize + "]");
@@ -147,11 +175,17 @@ public class Layer extends AbstractLayer {
 
         final StringBuilder builder = new StringBuilder();
 
-        builder.append("{ Layer: input [");
+        builder.append("{\n\tLayer: input [");
         builder.append(this.neurons.getLast().getWeightsSize());
         builder.append("], output [");
         builder.append(this.neurons.size());
-        builder.append("] }");
+        builder.append("]");
+
+        for (final Neuron neuron : this.neurons) {
+            builder.append("\n\t\t").append(neuron);
+        }
+
+        builder.append("\n}");
 
         return builder.toString();
     }

@@ -16,4 +16,9 @@ public class RectifiedLinearUnit implements IActivationFunction {
 
         return outputList;
     }
+
+    @Override
+    public double calculateDerivative(final double value) {
+        return Math.max(0, value);
+    }
 }
