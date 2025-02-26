@@ -42,6 +42,10 @@ public class CategoricalCrossEntropy extends AbstractLossLayer {
 
     @Override
     protected double forward(final DataList predictedList, final DataList targetList) {
+        if (predictedList.getDataListSize() != targetList.getDataListSize()) {
+            throw new IllegalArgumentException("Predicted list size [" + predictedList.getDataListSize() + "] is not equal to target list size [" + targetList.getDataListSize() + "]");
+        }
+
         final int targetListArgMax = CustomMath.argMax(targetList);
 
         final double targetListMax = targetList.getValue(targetListArgMax);

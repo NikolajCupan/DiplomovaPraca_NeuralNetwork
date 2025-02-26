@@ -12,7 +12,7 @@ import java.util.List;
 public class Softmax implements IActivationFunction {
     @Override
     public GradientStruct backward(final Batch inputGradientBatch, final Batch IGNORED_savedInputBatch, final Batch savedOutputBatch) {
-        final Batch outputBatch = new Batch();
+        final Batch gradientWRTInputs = new Batch();
 
         for (int i = 0; i < savedOutputBatch.getRowsSize(); ++i) {
             final DataList softmaxOutputRow = savedOutputBatch.getRow(i);
@@ -45,11 +45,12 @@ public class Softmax implements IActivationFunction {
                 );
             }
 
-            outputBatch.addRow(resultRow);
+            gradientWRTInputs.addRow(resultRow);
         }
 
-        return null;
-        // return outputBatch;
+        final GradientStruct gradientStruct = new GradientStruct();
+        gradientStruct.setGradientWithRespectToInputs(gradientWRTInputs);
+        return gradientStruct;
     }
 
     @Override
