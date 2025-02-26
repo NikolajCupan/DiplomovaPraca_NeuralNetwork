@@ -90,11 +90,17 @@ public class Main {
         final Batch softmaxOutput = softmax.forward(layerOutput);
         final DataList ccnetropyOutput = ccentropy.calculate(softmaxOutput, targetOutput);
 
-        final Batch b = new Batch();
-        b.addRow(new DataList(new Double[]{ 0.7, 0.1, 0.2 }));
-        softmax.backward(b);
+        final Batch ccentropyGradient = ccentropy.backward(softmaxOutput, targetOutput);
 
-        ccentropy.backward(softmaxOutput, targetOutput);
+        final Batch smOutput = new Batch();
+        smOutput.addRow(new DataList(new Double[]{ 0.7, 0.1, 0.2 }));
+        // smOutput.addRow(new DataList(new Double[]{ 0.3, 0.4, 0.3 }));
+
+        final Batch ceOutput = new Batch();
+        ceOutput.addRow(new DataList(new Double[]{ 0.5, -0.2, 0.1 }));
+        //ceOutput.addRow(new DataList(new Double[]{ -0.1, 0.4, -0.3 }));
+        softmax.back(smOutput, ceOutput);
+
 
         System.out.println("input");
         System.out.println(input);

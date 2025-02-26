@@ -24,8 +24,9 @@ public class ActivationLayer extends AbstractLayer {
         return this.calculateGradientWithRespectToInputs(ignore);
     }
 
-    @Override
-    public Batch backward(final Batch softmaxOutput) {
+    public Batch back(final Batch softmaxOutput, final Batch inputGradientBatch) {
+        final Batch outputBatch = new Batch();
+
         for (int i = 0; i < softmaxOutput.getRowsSize(); ++i) {
             final DataList softmaxOutputRow = softmaxOutput.getRow(i);
             final int size = softmaxOutputRow.getDataListSize();
@@ -36,10 +37,10 @@ public class ActivationLayer extends AbstractLayer {
                 final DataList row = new DataList(size);
 
                 for (int columnIndex = 0; columnIndex < size; ++columnIndex) {
-                        row.setValue(
-                                columnIndex,
-                                softmaxOutputRow.getValue(rowIndex) * softmaxOutputRow.getValue(columnIndex)
-                        );
+                    row.setValue(
+                            columnIndex,
+                            softmaxOutputRow.getValue(rowIndex) * softmaxOutputRow.getValue(columnIndex)
+                    );
                 }
 
                 batch.addRow(row);
@@ -47,8 +48,24 @@ public class ActivationLayer extends AbstractLayer {
 
             final Batch diagonalMatrix = ActivationLayer.getDiagonalMatrix(softmaxOutputRow);
             final Batch jacobianMatrix = CustomMath.subtractBatches(diagonalMatrix, batch);
+
+            final DataList inputGradientRow = inputGradientBatch.getRow(i);
+            final DataList resultRow = new DataList(jacobianMatrix.getRowsSize());
+
+            for (int jacobianMatrixRowIndex = 0; jacobianMatrixRowIndex < jacobianMatrix.getRowsSize(); ++jacobianMatrixRowIndex) {
+                resultRow.setValue(jacobianMatrixRowIndex,
+                        CustomMath.dotProduct(jacobianMatrix.getRow(jacobianMatrixRowIndex).getDataListRawValues(), inputGradientRow.getDataListRawValues())
+                );
+            }
+
+            outputBatch.addRow(resultRow);
         }
 
+        return outputBatch;
+    }
+
+    @Override
+    public Batch backward(final Batch softmaxOutput) {
         return null;
     }
 
