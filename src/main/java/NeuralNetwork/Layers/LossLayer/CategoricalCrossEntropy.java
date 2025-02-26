@@ -7,8 +7,15 @@ import Utilities.CustomMath;
 public class CategoricalCrossEntropy extends AbstractLossLayer {
     private static final double CLAMP_VALUE = 0.0000001;
 
+    public CategoricalCrossEntropy() {
+        super();
+    }
+
     @Override
-    public Batch backward(final Batch predictedBatch, final Batch targetBatch) {
+    public Batch backward() {
+        final Batch predictedBatch = this.getSavedPredictedBatch();
+        final Batch targetBatch = this.getSavedTargetBatch();
+
         final int predictedBatchRowsSize = predictedBatch.getRowsSize();
         final int predictedBatchColumnsSize = predictedBatch.getColumnsSize();
 
@@ -34,7 +41,7 @@ public class CategoricalCrossEntropy extends AbstractLossLayer {
     }
 
     @Override
-    protected double calculate(final DataList predictedList, final DataList targetList) {
+    protected double forward(final DataList predictedList, final DataList targetList) {
         final int targetListArgMax = CustomMath.argMax(targetList);
 
         final double targetListMax = targetList.getValue(targetListArgMax);
@@ -42,11 +49,11 @@ public class CategoricalCrossEntropy extends AbstractLossLayer {
             throw new IllegalArgumentException("Categorical cross entropy requires one-hot target list row");
         }
 
-        return this.calculate(predictedList, targetListArgMax);
+        return this.forward(predictedList, targetListArgMax);
     }
 
     @Override
-    protected double calculate(final DataList predictedList, final int targetIndex) {
+    protected double forward(final DataList predictedList, final int targetIndex) {
         final double predictedValue = predictedList.getValue(targetIndex);
         final double clampedValue = Math.clamp(predictedValue, CLAMP_VALUE, 1.0 - CLAMP_VALUE);
 

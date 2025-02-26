@@ -5,13 +5,17 @@ import NeuralNetwork.DataList;
 import Utilities.CustomMath;
 
 public class Accuracy extends AbstractLossLayer {
+    public Accuracy() {
+        super();
+    }
+
     @Override
-    public Batch backward(final Batch predictedBatch, final Batch targetBatch) {
+    public Batch backward() {
         throw new UnsupportedOperationException("Backward method of accuracy loss function is not implemented");
     }
 
     @Override
-    protected double calculate(final DataList predictedList, final DataList targetRow) {
+    protected double forward(final DataList predictedList, final DataList targetRow) {
         final int targetListArgMax = CustomMath.argMax(targetRow);
 
         final double targetListMax = targetRow.getValue(targetListArgMax);
@@ -19,11 +23,11 @@ public class Accuracy extends AbstractLossLayer {
             throw new IllegalArgumentException("Accuracy requires one-hot target list row");
         }
 
-        return this.calculate(predictedList, targetListArgMax);
+        return this.forward(predictedList, targetListArgMax);
     }
 
     @Override
-    protected double calculate(final DataList predictedList, final int targetIndex) {
+    protected double forward(final DataList predictedList, final int targetIndex) {
         final int predictedListArgMax = CustomMath.argMax(predictedList);
 
         if (predictedListArgMax == targetIndex) {

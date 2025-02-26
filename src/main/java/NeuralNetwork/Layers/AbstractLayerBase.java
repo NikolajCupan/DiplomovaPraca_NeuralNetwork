@@ -15,6 +15,22 @@ public abstract class AbstractLayerBase {
         this.savedOutputBatch = Optional.empty();
     }
 
+    protected Batch getSavedInputBatch() {
+        if (this.savedInputBatch.isEmpty()) {
+            throw new IllegalArgumentException("Layer has not processed an input batch yet");
+        }
+
+        return this.savedInputBatch.get();
+    }
+
+    protected Batch getSavedOutputBatch() {
+        if (this.savedOutputBatch.isEmpty()) {
+            throw new IllegalArgumentException("Layer has not processed an input batch yet");
+        }
+
+        return this.savedOutputBatch.get();
+    }
+
     public Batch forward(final Batch inputBatch) {
         if (this.savedInputBatch.isPresent() || this.savedOutputBatch.isPresent()) {
             throw new IllegalArgumentException("Layer already processed an input batch");
@@ -32,22 +48,6 @@ public abstract class AbstractLayerBase {
 
         this.savedOutputBatch = Optional.of(outputBatch);
         return outputBatch;
-    }
-
-    protected Batch getSavedInputBatch() {
-        if (this.savedInputBatch.isEmpty()) {
-            throw new IllegalArgumentException("Layer has not processed an input batch yet");
-        }
-
-        return this.savedInputBatch.get();
-    }
-
-    protected Batch getSavedOutputBatch() {
-        if (this.savedOutputBatch.isEmpty()) {
-            throw new IllegalArgumentException("Layer has not processed an input batch yet");
-        }
-
-        return this.savedOutputBatch.get();
     }
 
     protected abstract DataList forward(final DataList inputRow);
