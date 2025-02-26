@@ -76,11 +76,6 @@ public class Softmax implements IActivationFunction {
         return outputList;
     }
 
-    @Override
-    public double calculateDerivative(final double value) {
-        throw new UnsupportedOperationException("Softmax activation function derivative is not implemented");
-    }
-
     private static double getMax(final DataList inputList) {
         final Double[] values = inputList.getDataListRawValues();
         final List<Double> list = Arrays.asList(values);

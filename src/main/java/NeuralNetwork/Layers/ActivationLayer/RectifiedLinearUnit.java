@@ -6,12 +6,13 @@ import Utilities.GradientStruct;
 
 public class RectifiedLinearUnit implements IActivationFunction {
     @Override
-    public GradientStruct backward(final Batch IGNORED_inputGradientBatch, final Batch savedInputBatch, final Batch IGNORED_savedOutputBatch) {
+    public GradientStruct backward(final Batch inputGradientBatch, final Batch savedInputBatch, final Batch IGNORED_savedOutputBatch) {
         final Batch gradientWRTInputs = new Batch();
 
         for (int rowIndex = 0; rowIndex < savedInputBatch.getRowsSize(); ++rowIndex) {
-            final DataList inputBatchRow = savedInputBatch.getRow(rowIndex);
-            gradientWRTInputs.addRow(this.calculateGradientWithRespectToInputs(inputBatchRow));
+            final DataList inputGradientRow = inputGradientBatch.getRow(rowIndex);
+            final DataList savedInputRow = savedInputBatch.getRow(rowIndex);
+            gradientWRTInputs.addRow(this.calculateGradientWithRespectToInputs(inputGradientRow, savedInputRow));
         }
 
         final GradientStruct gradientStruct = new GradientStruct();
@@ -19,15 +20,18 @@ public class RectifiedLinearUnit implements IActivationFunction {
         return gradientStruct;
     }
 
-    private DataList calculateGradientWithRespectToInputs(final DataList inputGradient) {
-        final DataList outputList = new DataList(inputGradient.getDataListSize());
+    private DataList calculateGradientWithRespectToInputs(final DataList inputGradientRow, final DataList savedInputRow) {
+        final DataList outputList = new DataList(inputGradientRow.getDataListSize());
 
-        for (int columnIndex = 0; columnIndex < inputGradient.getDataListSize(); ++columnIndex) {
-            final double derivative = this.calculateDerivative(
-                    inputGradient.getValue(columnIndex)
-            );
+        for (int columnIndex = 0; columnIndex < inputGradientRow.getDataListSize(); ++columnIndex) {
+            final double inputGradientValue = inputGradientRow.getValue(columnIndex);
+            final double reluInputValue = savedInputRow.getValue(columnIndex);
 
-            outputList.setValue(columnIndex, derivative);
+            if (reluInputValue > 0) {
+                outputList.setValue(columnIndex, inputGradientValue);
+            } else {
+                outputList.setValue(columnIndex, 0);
+            }
         }
 
         return outputList;
@@ -45,10 +49,5 @@ public class RectifiedLinearUnit implements IActivationFunction {
         }
 
         return outputList;
-    }
-
-    @Override
-    public double calculateDerivative(final double value) {
-        return Math.max(0, value);
     }
 }
