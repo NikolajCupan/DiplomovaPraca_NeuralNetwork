@@ -79,7 +79,7 @@ public class Layer extends AbstractLayer {
         final DataList outputRow = new DataList(this.neurons.size());
 
         for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
-            final double neuronOutput = this.neurons.get(neuronIndex).calculateOutput(inputRow);
+            final double neuronOutput = this.neurons.get(neuronIndex).forward(inputRow);
             outputRow.setValue(neuronIndex, neuronOutput);
         }
 

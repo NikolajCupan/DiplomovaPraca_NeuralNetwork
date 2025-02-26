@@ -48,7 +48,7 @@ public class Neuron {
         }
     }
 
-    public double calculateOutput(final DataList inputRow) {
+    public double forward(final DataList inputRow) {
         if (this.weights.getDataListSize() != inputRow.getDataListSize()) {
            throw new IllegalArgumentException("Size of input row [" + inputRow.getDataListSize() + "] is not equal to size of weights [" + this.weights.getDataListSize() + "]");
         }

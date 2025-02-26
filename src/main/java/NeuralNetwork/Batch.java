@@ -10,18 +10,18 @@ public class Batch {
         this.batch = new ArrayList<>();
     }
 
-    public void addRow(final DataList row) {
+    public void addRow(final DataList rowToBeAdded) {
         if (!this.batch.isEmpty()) {
-            final int rowSize = this.batch.getFirst().getDataListSize();
+            final int rowsSize = this.batch.getFirst().getDataListSize();
 
-            if (row.getDataListSize() != rowSize) {
+            if (rowToBeAdded.getDataListSize() != rowsSize) {
                 throw new IllegalArgumentException(
-                        "New row size [" + row.getDataListSize() + "] is not equal to current row size [" + rowSize + "]"
+                        "New row size [" + rowToBeAdded.getDataListSize() + "] is not equal to current rows size [" + rowsSize + "]"
                 );
             }
         }
 
-        this.batch.add(row);
+        this.batch.add(rowToBeAdded);
     }
 
     public DataList getRow(final int rowIndex) {
