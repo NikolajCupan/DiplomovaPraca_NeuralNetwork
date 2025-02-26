@@ -20,6 +20,35 @@ public class CustomMath {
         return result;
     }
 
+    public static Batch subtractBatches(final Batch left, final Batch right) {
+        if (left.getRowsSize() != right.getRowsSize()
+                || left.getColumnsSize() != right.getColumnsSize()
+        ) {
+            throw new IllegalArgumentException("Size of batches do not match, left [" + left.getRowsSize() + " x " + left.getColumnsSize()
+                    + "], right [" + right.getRowsSize() + " x " + right.getColumnsSize() + "]");
+        }
+
+        final Batch outputBatch = new Batch();
+
+        for (int rowIndex = 0; rowIndex < left.getRowsSize(); ++rowIndex) {
+            final DataList leftRow = left.getRow(rowIndex);
+            final DataList rightRow = right.getRow(rowIndex);
+
+            final DataList row = new DataList(left.getColumnsSize());
+
+            for (int columnIndex = 0; columnIndex < left.getColumnsSize(); ++columnIndex) {
+                row.setValue(
+                        columnIndex,
+                        leftRow.getValue(columnIndex) - rightRow.getValue(columnIndex)
+                );
+            }
+
+            outputBatch.addRow(row);
+        }
+
+        return outputBatch;
+    }
+
     public static int argMax(final DataList list) {
         if (list.isEmpty()) {
             throw new IllegalArgumentException("Data list is empty");

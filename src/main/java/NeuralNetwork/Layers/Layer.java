@@ -87,6 +87,11 @@ public class Layer extends AbstractLayer {
     }
 
     @Override
+    public Batch backward() {
+        throw new UnsupportedOperationException("Backward method in layer cannot be called without argument");
+    }
+
+    @Override
     public Batch backward(final Batch inputGradientBatch) {
         final Batch gradientWRTInputs = this.calculateGradientWithRespectToInputs(inputGradientBatch);
 

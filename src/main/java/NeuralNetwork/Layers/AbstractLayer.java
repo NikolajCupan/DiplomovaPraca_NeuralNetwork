@@ -39,6 +39,8 @@ public abstract class AbstractLayer {
     }
 
     protected abstract DataList forward(final DataList inputRow);
+
+    public abstract Batch backward();
     public abstract Batch backward(final Batch inputGradientBatch);
 
     protected abstract Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch);

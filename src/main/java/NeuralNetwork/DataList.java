@@ -2,6 +2,8 @@ package NeuralNetwork;
 
 import Utilities.Helper;
 
+import java.util.Arrays;
+
 public class DataList {
     private final Double[] dataValues;
 
@@ -11,6 +13,10 @@ public class DataList {
 
     public DataList(final Double[] dataValues) {
         this.dataValues = dataValues;
+    }
+
+    public void fill(final double value) {
+        Arrays.fill(this.dataValues, value);
     }
 
     public int getDataListSize() {

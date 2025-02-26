@@ -3,8 +3,8 @@ package NeuralNetwork.LossFunctions;
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
 
-public interface ILossFunction {
-    default DataList calculate(final Batch predictedBatch, final Batch targetBatch) {
+public abstract class AbstractLossFunction {
+    public DataList calculate(final Batch predictedBatch, final Batch targetBatch) {
         final DataList outputRow = new DataList(predictedBatch.getRowsSize());
 
         for (int i = 0; i < predictedBatch.getRowsSize(); ++i) {
@@ -18,7 +18,7 @@ public interface ILossFunction {
         return outputRow;
     }
 
-    default DataList calculate(final Batch predictedBatch, final Integer[] targetIndexes) {
+    private DataList calculate(final Batch predictedBatch, final Integer[] targetIndexes) {
         final DataList outputRow = new DataList(predictedBatch.getRowsSize());
 
         for (int i = 0; i < predictedBatch.getRowsSize(); ++i) {
@@ -32,6 +32,8 @@ public interface ILossFunction {
         return outputRow;
     }
 
-    double calculate(final DataList predictedRow, final DataList targetRow);
-    double calculate(final DataList predictedRow, final int targetIndex);
+    public abstract Batch backward(final Batch predictedBatch, final Batch targetBatch);
+
+    protected abstract double calculate(final DataList predictedRow, final DataList targetRow);
+    protected abstract double  calculate(final DataList predictedRow, final int targetIndex);
 }

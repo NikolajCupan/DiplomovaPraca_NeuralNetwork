@@ -1,8 +1,9 @@
-import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
+import NeuralNetwork.ActivationFunctions.Softmax;
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
 import NeuralNetwork.Layers.ActivationLayer;
 import NeuralNetwork.Layers.Layer;
+import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import NeuralNetwork.Neuron;
 
 public class Main {
@@ -27,7 +28,7 @@ public class Main {
 
     public static ActivationLayer getActivationLayer() {
         return new ActivationLayer(
-                new RectifiedLinearUnit()
+                new Softmax()
         );
     }
 
@@ -37,6 +38,20 @@ public class Main {
         final DataList input1 = new DataList(new Double[]{ 1.0, 2.0, 3.0, 2.5 });
         final DataList input2 = new DataList(new Double[]{ 2.0, 5.0, -1.0, 2.0 });
         final DataList input3 = new DataList(new Double[]{ -1.5, 2.7, 3.3, -0.8 });
+
+        batch.addRow(input1);
+        batch.addRow(input2);
+        batch.addRow(input3);
+
+        return batch;
+    }
+
+    public static Batch getOutput() {
+        final Batch batch = new Batch();
+
+        final DataList input1 = new DataList(new Double[]{ 1.0, 0.0, 0.0 });
+        final DataList input2 = new DataList(new Double[]{ 1.0, 0.0, 0.0 });
+        final DataList input3 = new DataList(new Double[]{ 0.0, 1.0, 0.0 });
 
         batch.addRow(input1);
         batch.addRow(input2);
@@ -59,19 +74,42 @@ public class Main {
         return batch;
     }
 
+    public static CategoricalCrossEntropy getLossLayer() {
+        return new CategoricalCrossEntropy();
+    }
+
     public static void main(String[] args) {
-        final Layer layer = Main.getLayer();
-        final ActivationLayer activationLayer = Main.getActivationLayer();
         final Batch input = Main.getInput();
+        final Batch targetOutput = Main.getOutput();
+
+        final Layer layer = Main.getLayer();
+        final ActivationLayer softmax = new ActivationLayer(new Softmax());
+        final CategoricalCrossEntropy ccentropy = new CategoricalCrossEntropy();
 
         final Batch layerOutput = layer.forward(input);
-        final Batch activationLayerOutput = activationLayer.forward(layerOutput);
+        final Batch softmaxOutput = softmax.forward(layerOutput);
+        final DataList ccnetropyOutput = ccentropy.calculate(softmaxOutput, targetOutput);
 
-        System.out.println(layer);
+        final Batch b = new Batch();
+        b.addRow(new DataList(new Double[]{ 0.7, 0.1, 0.2 }));
+        softmax.backward(b);
 
-        final Batch reluGradient = activationLayer.backward(null);
-        final Batch layerGradient = layer.backward(reluGradient);
+        ccentropy.backward(softmaxOutput, targetOutput);
 
-        System.out.println(layer);
+        System.out.println("input");
+        System.out.println(input);
+
+        System.out.println("\ntarget output");
+        System.out.println(targetOutput);
+
+        System.out.println("\n");
+
+        System.out.println("\nlayer output");
+        System.out.println(layerOutput);
+
+        System.out.println("\nsoftmax output");
+        System.out.println(softmaxOutput);
+        System.out.println("\ncc entropy output");
+        System.out.println(ccnetropyOutput);
     }
 }

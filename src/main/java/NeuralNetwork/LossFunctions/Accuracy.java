@@ -1,11 +1,17 @@
 package NeuralNetwork.LossFunctions;
 
+import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
 import Utilities.CustomMath;
 
-public class Accuracy implements ILossFunction {
+public class Accuracy extends AbstractLossFunction {
     @Override
-    public double calculate(final DataList predictedList, final DataList targetRow) {
+    public Batch backward(final Batch predictedBatch, final Batch targetBatch) {
+        throw new UnsupportedOperationException("Backward method of accuracy loss function is not implemented");
+    }
+
+    @Override
+    protected double calculate(final DataList predictedList, final DataList targetRow) {
         final int targetListArgMax = CustomMath.argMax(targetRow);
 
         final double targetListMax = targetRow.getValue(targetListArgMax);
@@ -17,7 +23,7 @@ public class Accuracy implements ILossFunction {
     }
 
     @Override
-    public double calculate(final DataList predictedList, final int targetIndex) {
+    protected double calculate(final DataList predictedList, final int targetIndex) {
         final int predictedListArgMax = CustomMath.argMax(predictedList);
 
         if (predictedListArgMax == targetIndex) {

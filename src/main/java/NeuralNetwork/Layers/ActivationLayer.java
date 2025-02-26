@@ -3,6 +3,7 @@ package NeuralNetwork.Layers;
 import NeuralNetwork.ActivationFunctions.IActivationFunction;
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
+import Utilities.CustomMath;
 
 public class ActivationLayer extends AbstractLayer {
     private final IActivationFunction activationFunction;
@@ -18,8 +19,37 @@ public class ActivationLayer extends AbstractLayer {
     }
 
     @Override
-    public Batch backward(final Batch ignore) {
+    public Batch backward() {
+        final Batch ignore = new Batch();
         return this.calculateGradientWithRespectToInputs(ignore);
+    }
+
+    @Override
+    public Batch backward(final Batch softmaxOutput) {
+        for (int i = 0; i < softmaxOutput.getRowsSize(); ++i) {
+            final DataList softmaxOutputRow = softmaxOutput.getRow(i);
+            final int size = softmaxOutputRow.getDataListSize();
+
+            final Batch batch = new Batch();
+
+            for (int rowIndex = 0; rowIndex < size; ++rowIndex) {
+                final DataList row = new DataList(size);
+
+                for (int columnIndex = 0; columnIndex < size; ++columnIndex) {
+                        row.setValue(
+                                columnIndex,
+                                softmaxOutputRow.getValue(rowIndex) * softmaxOutputRow.getValue(columnIndex)
+                        );
+                }
+
+                batch.addRow(row);
+            }
+
+            final Batch diagonalMatrix = ActivationLayer.getDiagonalMatrix(softmaxOutputRow);
+            final Batch jacobianMatrix = CustomMath.subtractBatches(diagonalMatrix, batch);
+        }
+
+        return null;
     }
 
     @Override
@@ -57,5 +87,20 @@ public class ActivationLayer extends AbstractLayer {
         }
 
         return outputList;
+    }
+
+    public static Batch getDiagonalMatrix(final DataList list) {
+        final Batch matrix = new Batch();
+        final int size = list.getDataListSize();
+
+        for (int i = 0; i < size; ++i) {
+            final DataList row = new DataList(size);
+            row.fill(0);
+
+            row.setValue(i, list.getValue(i));
+            matrix.addRow(row);
+        }
+
+        return matrix;
     }
 }
