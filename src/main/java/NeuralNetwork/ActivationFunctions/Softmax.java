@@ -33,7 +33,7 @@ public class Softmax implements IActivationFunction {
 
     @Override
     public double calculateDerivative(final double value) {
-        throw new UnsupportedOperationException("Softmax activation function derivative is not implemented yet");
+        throw new UnsupportedOperationException("Softmax activation function derivative is not implemented");
     }
 
     private static double getMax(final DataList inputList) {

@@ -12,7 +12,7 @@ public abstract class AbstractLayer {
         this.savedInputBatch = Optional.empty();
     }
 
-    public Batch calculateOutputBatch(final Batch inputBatch) {
+    public Batch forward(final Batch inputBatch) {
         if (this.savedInputBatch.isPresent()) {
             throw new IllegalArgumentException("Layer already processed an input batch");
         }
@@ -20,17 +20,17 @@ public abstract class AbstractLayer {
 
         final Batch outputBatch = new Batch();
 
-        for (int i = 0; i < inputBatch.getRowsSize(); ++i) {
-            final DataList inputRow = inputBatch.getRow(i);
-            final DataList calculatedRow = this.calculateOutputRow(inputRow);
+        for (int rowIndex = 0; rowIndex < inputBatch.getRowsSize(); ++rowIndex) {
+            final DataList inputRow = inputBatch.getRow(rowIndex);
 
+            final DataList calculatedRow = this.forward(inputRow);
             outputBatch.addRow(calculatedRow);
         }
 
         return outputBatch;
     }
 
-    protected Batch getInputBatch() {
+    protected Batch getSavedInputBatch() {
         if (this.savedInputBatch.isEmpty()) {
             throw new IllegalArgumentException("Layer has not processed an input batch yet");
         }
@@ -38,8 +38,10 @@ public abstract class AbstractLayer {
         return this.savedInputBatch.get();
     }
 
+    public abstract Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch);
+    public abstract Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch);
     public abstract Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch);
     protected abstract DataList calculateGradientWithRespectToInputs(final DataList inputGradient);
 
-    protected abstract DataList calculateOutputRow(final DataList inputRow);
+    protected abstract DataList forward(final DataList inputRow);
 }

@@ -66,8 +66,8 @@ public class Main {
         final Batch input = Main.getInput();
         final Batch gradient = Main.getGradient();
 
-        final Batch layerOutput = layer.calculateOutputBatch(input);
-        final Batch activationLayerOutput = activationLayer.calculateOutputBatch(layerOutput);
+        final Batch layerOutput = layer.forward(input);
+        final Batch activationLayerOutput = activationLayer.forward(layerOutput);
 
         final Batch reluGradient = activationLayer.calculateGradientWithRespectToInputs(null);
 

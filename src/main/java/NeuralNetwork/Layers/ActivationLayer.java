@@ -13,11 +13,21 @@ public class ActivationLayer extends AbstractLayer {
     }
 
     @Override
+    public Batch calculateGradientWithRespectToBiases(Batch inputGradientBatch) {
+        throw new UnsupportedOperationException("Activation layer cannot calculate gradient with respect to biases");
+    }
+
+    @Override
+    public Batch calculateGradientWithRespectToWeights(Batch inputGradientBatch) {
+        throw new UnsupportedOperationException("Activation layer cannot calculate gradient with respect to weights");
+    }
+
+    @Override
     public Batch calculateGradientWithRespectToInputs(final Batch ignore) {
         final Batch outputGradientBatch = new Batch();
 
-        for (int rowIndex = 0; rowIndex < this.getInputBatch().getRowsSize(); ++rowIndex) {
-            final DataList inputBatchRow = this.getInputBatch().getRow(rowIndex);
+        for (int rowIndex = 0; rowIndex < this.getSavedInputBatch().getRowsSize(); ++rowIndex) {
+            final DataList inputBatchRow = this.getSavedInputBatch().getRow(rowIndex);
             outputGradientBatch.addRow(this.calculateGradientWithRespectToInputs(inputBatchRow));
         }
 
@@ -40,7 +50,7 @@ public class ActivationLayer extends AbstractLayer {
     }
 
     @Override
-    protected DataList calculateOutputRow(final DataList inputRow) {
+    protected DataList forward(final DataList inputRow) {
         return this.activationFunction.apply(inputRow);
     }
 }

@@ -54,6 +54,27 @@ public class Layer extends AbstractLayer {
         }
     }
 
+    private DataList getColumnWeights(final int columnIndex) {
+        if (this.neurons.isEmpty()) {
+            throw new IllegalArgumentException("Neuron list is empty");
+        }
+
+        // Number of connections between one input from previous layer and all neurons in current layer
+        final int connectionsSize = this.neurons.size();
+
+        final DataList columnWeights = new DataList(connectionsSize);
+
+        for (int rowIndex = 0; rowIndex < connectionsSize; ++rowIndex) {
+            final Neuron neuron = this.neurons.get(rowIndex);
+            final double weight = neuron.getWeight(columnIndex);
+
+            columnWeights.setValue(rowIndex, weight);
+        }
+
+        return columnWeights;
+    }
+
+    @Override
     public Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch) {
         final int inputGradientColumnsSize = inputGradientBatch.getColumnsSize();
         final DataList gradients = new DataList(inputGradientColumnsSize);
@@ -71,10 +92,11 @@ public class Layer extends AbstractLayer {
         return gradientBatch;
     }
 
+    @Override
     public Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
-        final Batch inputBatch = this.getInputBatch();
+        final Batch inputBatch = this.getSavedInputBatch();
         final int inputBatchColumnsSize = inputBatch.getColumnsSize();
 
         final int inputGradientColumnsSize = inputGradientBatch.getColumnsSize();
@@ -135,28 +157,8 @@ public class Layer extends AbstractLayer {
         return outputGradient;
     }
 
-    private DataList getColumnWeights(final int columnIndex) {
-        if (this.neurons.isEmpty()) {
-            throw new IllegalArgumentException("Neuron list is empty");
-        }
-
-        // Number of connections between one input from previous layer and all neurons in current layer
-        final int connectionsSize = this.neurons.size();
-
-        final DataList columnWeights = new DataList(connectionsSize);
-
-        for (int rowIndex = 0; rowIndex < connectionsSize; ++rowIndex) {
-            final Neuron neuron = this.neurons.get(rowIndex);
-            final double weight = neuron.getWeight(columnIndex);
-
-            columnWeights.setValue(rowIndex, weight);
-        }
-
-        return columnWeights;
-    }
-
     @Override
-    protected DataList calculateOutputRow(final DataList inputRow) {
+    protected DataList forward(final DataList inputRow) {
         final DataList outputRow = new DataList(this.neurons.size());
 
         for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
