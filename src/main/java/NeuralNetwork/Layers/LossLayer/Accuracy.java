@@ -1,10 +1,10 @@
-package NeuralNetwork.LossFunctions;
+package NeuralNetwork.Layers.LossLayer;
 
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
 import Utilities.CustomMath;
 
-public class Accuracy extends AbstractLossFunction {
+public class Accuracy extends AbstractLossLayer {
     @Override
     public Batch backward(final Batch predictedBatch, final Batch targetBatch) {
         throw new UnsupportedOperationException("Backward method of accuracy loss function is not implemented");

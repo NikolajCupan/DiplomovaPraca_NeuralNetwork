@@ -1,14 +1,16 @@
-package NeuralNetwork.Layers;
+package NeuralNetwork.Layers.NormalLayer;
 
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
+import NeuralNetwork.Layers.AbstractLayerBase;
 import NeuralNetwork.Neuron;
 import Utilities.CustomMath;
+import Utilities.GradientStruct;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Layer extends AbstractLayer {
+public class Layer extends AbstractLayerBase {
     private final List<Neuron> neurons;
 
     public Layer() {
@@ -87,43 +89,36 @@ public class Layer extends AbstractLayer {
     }
 
     @Override
-    public Batch backward() {
-        throw new UnsupportedOperationException("Backward method in layer cannot be called without argument");
-    }
-
-    @Override
-    public Batch backward(final Batch inputGradientBatch) {
-        final Batch gradientWRTInputs = this.calculateGradientWithRespectToInputs(inputGradientBatch);
-
+    public GradientStruct backward(final Batch inputGradientBatch) {
         final Batch gradientWRTBiases = this.calculateGradientWithRespectToBiases(inputGradientBatch);
         final Batch gradientWRTWeights = this.calculateGradientWithRespectToWeights(inputGradientBatch);
+        final Batch gradientWRTInputs = this.calculateGradientWithRespectToInputs(inputGradientBatch);
 
-        this.updateBiases(gradientWRTBiases);
-        this.updateWeights(gradientWRTWeights);
-
-        return null;
+        final GradientStruct gradientStruct = new GradientStruct();
+        gradientStruct.setGradientWithRespectToBiases(gradientWRTBiases);
+        gradientStruct.setGradientWithRespectToWeights(gradientWRTWeights);
+        gradientStruct.setGradientWithRespectToInputs(gradientWRTInputs);
+        return gradientStruct;
     }
 
-    @Override
-    protected Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch) {
+    private Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch) {
         final int inputGradientColumnsSize = inputGradientBatch.getColumnsSize();
-        final DataList gradients = new DataList(inputGradientColumnsSize);
+        final DataList calculatedGradient = new DataList(inputGradientColumnsSize);
 
         for (int columnIndex = 0; columnIndex < inputGradientColumnsSize; ++columnIndex) {
             final DataList gradientColumn = inputGradientBatch.getColumn(columnIndex);
-            gradients.setValue(
+            calculatedGradient.setValue(
                     columnIndex,
                     CustomMath.sum(gradientColumn)
             );
         }
 
         final Batch gradientBatch = new Batch();
-        gradientBatch.addRow(gradients);
+        gradientBatch.addRow(calculatedGradient);
         return gradientBatch;
     }
 
-    @Override
-    protected Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
+    private Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
         final Batch inputBatch = this.getSavedInputBatch();
@@ -152,8 +147,7 @@ public class Layer extends AbstractLayer {
         return outputGradientBatch;
     }
 
-    @Override
-    protected Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
+    private Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
         for (int rowIndex = 0; rowIndex < inputGradientBatch.getRowsSize(); ++rowIndex) {
@@ -164,8 +158,7 @@ public class Layer extends AbstractLayer {
         return outputGradientBatch;
     }
 
-    @Override
-    protected DataList calculateGradientWithRespectToInputs(final DataList inputGradient) {
+    private DataList calculateGradientWithRespectToInputs(final DataList inputGradient) {
         final int neuronsSize = this.neurons.size();
         if (neuronsSize != inputGradient.getDataListSize()) {
             throw new IllegalArgumentException("Input gradient size [" + inputGradient.getDataListSize() + "] is not equal to neurons size [" + neuronsSize + "]");

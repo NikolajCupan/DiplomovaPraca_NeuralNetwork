@@ -2,18 +2,21 @@ package NeuralNetwork.Layers;
 
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
+import Utilities.GradientStruct;
 
 import java.util.Optional;
 
-public abstract class AbstractLayer {
+public abstract class AbstractLayerBase {
     private Optional<Batch> savedInputBatch;
+    private Optional<Batch> savedOutputBatch;
 
-    protected AbstractLayer() {
+    protected AbstractLayerBase() {
         this.savedInputBatch = Optional.empty();
+        this.savedOutputBatch = Optional.empty();
     }
 
     public Batch forward(final Batch inputBatch) {
-        if (this.savedInputBatch.isPresent()) {
+        if (this.savedInputBatch.isPresent() || this.savedOutputBatch.isPresent()) {
             throw new IllegalArgumentException("Layer already processed an input batch");
         }
         this.savedInputBatch = Optional.of(inputBatch);
@@ -27,6 +30,7 @@ public abstract class AbstractLayer {
             outputBatch.addRow(calculatedRow);
         }
 
+        this.savedOutputBatch = Optional.of(outputBatch);
         return outputBatch;
     }
 
@@ -38,13 +42,14 @@ public abstract class AbstractLayer {
         return this.savedInputBatch.get();
     }
 
+    protected Batch getSavedOutputBatch() {
+        if (this.savedOutputBatch.isEmpty()) {
+            throw new IllegalArgumentException("Layer has not processed an input batch yet");
+        }
+
+        return this.savedOutputBatch.get();
+    }
+
     protected abstract DataList forward(final DataList inputRow);
-
-    public abstract Batch backward();
-    public abstract Batch backward(final Batch inputGradientBatch);
-
-    protected abstract Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch);
-    protected abstract Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch);
-    protected abstract Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch);
-    protected abstract DataList calculateGradientWithRespectToInputs(final DataList inputGradient);
+    public abstract GradientStruct backward(final Batch inputGradientBatch);
 }

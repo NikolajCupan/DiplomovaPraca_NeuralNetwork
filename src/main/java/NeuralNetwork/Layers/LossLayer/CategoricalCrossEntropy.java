@@ -1,10 +1,10 @@
-package NeuralNetwork.LossFunctions;
+package NeuralNetwork.Layers.LossLayer;
 
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
 import Utilities.CustomMath;
 
-public class CategoricalCrossEntropy extends AbstractLossFunction {
+public class CategoricalCrossEntropy extends AbstractLossLayer {
     private static final double CLAMP_VALUE = 0.0000001;
 
     @Override

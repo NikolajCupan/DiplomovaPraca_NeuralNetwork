@@ -1,9 +1,9 @@
-package NeuralNetwork.LossFunctions;
+package NeuralNetwork.Layers.LossLayer;
 
 import NeuralNetwork.Batch;
 import NeuralNetwork.DataList;
 
-public abstract class AbstractLossFunction {
+public abstract class AbstractLossLayer {
     public DataList calculate(final Batch predictedBatch, final Batch targetBatch) {
         final DataList outputRow = new DataList(predictedBatch.getRowsSize());
 
@@ -35,5 +35,5 @@ public abstract class AbstractLossFunction {
     public abstract Batch backward(final Batch predictedBatch, final Batch targetBatch);
 
     protected abstract double calculate(final DataList predictedRow, final DataList targetRow);
-    protected abstract double  calculate(final DataList predictedRow, final int targetIndex);
+    protected abstract double calculate(final DataList predictedRow, final int targetIndex);
 }
