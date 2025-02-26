@@ -62,27 +62,15 @@ public class Main {
     public static void main(String[] args) {
         final Layer layer = Main.getLayer();
         final ActivationLayer activationLayer = Main.getActivationLayer();
-
         final Batch input = Main.getInput();
-        final Batch gradient = Main.getGradient();
 
         final Batch layerOutput = layer.forward(input);
         final Batch activationLayerOutput = activationLayer.forward(layerOutput);
 
-        final Batch reluGradient = activationLayer.calculateGradientWithRespectToInputs(null);
-
-        final Batch gradientWRTInputs = layer.calculateGradientWithRespectToInputs(reluGradient);
-        final Batch gradientWRTWeights = layer.calculateGradientWithRespectToWeights(reluGradient);
-        final Batch gradientWRTBiases = layer.calculateGradientWithRespectToBiases(reluGradient);
-
         System.out.println(layer);
 
-        //System.out.println(gradientWRTInputs);
-        System.out.println(gradientWRTWeights);
-        //System.out.println(gradientWRTBiases);
-
-        layer.updateBiases(gradientWRTBiases);
-        layer.updateWeights(gradientWRTWeights);
+        final Batch reluGradient = activationLayer.backward(null);
+        final Batch layerGradient = layer.backward(reluGradient);
 
         System.out.println(layer);
     }

@@ -75,7 +75,32 @@ public class Layer extends AbstractLayer {
     }
 
     @Override
-    public Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch) {
+    protected DataList forward(final DataList inputRow) {
+        final DataList outputRow = new DataList(this.neurons.size());
+
+        for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
+            final double neuronOutput = this.neurons.get(neuronIndex).calculateOutput(inputRow);
+            outputRow.setValue(neuronIndex, neuronOutput);
+        }
+
+        return outputRow;
+    }
+
+    @Override
+    public Batch backward(final Batch inputGradientBatch) {
+        final Batch gradientWRTInputs = this.calculateGradientWithRespectToInputs(inputGradientBatch);
+
+        final Batch gradientWRTBiases = this.calculateGradientWithRespectToBiases(inputGradientBatch);
+        final Batch gradientWRTWeights = this.calculateGradientWithRespectToWeights(inputGradientBatch);
+
+        this.updateBiases(gradientWRTBiases);
+        this.updateWeights(gradientWRTWeights);
+
+        return null;
+    }
+
+    @Override
+    protected Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch) {
         final int inputGradientColumnsSize = inputGradientBatch.getColumnsSize();
         final DataList gradients = new DataList(inputGradientColumnsSize);
 
@@ -93,7 +118,7 @@ public class Layer extends AbstractLayer {
     }
 
     @Override
-    public Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
+    protected Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
         final Batch inputBatch = this.getSavedInputBatch();
@@ -123,7 +148,7 @@ public class Layer extends AbstractLayer {
     }
 
     @Override
-    public Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
+    protected Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch) {
         final Batch outputGradientBatch = new Batch();
 
         for (int rowIndex = 0; rowIndex < inputGradientBatch.getRowsSize(); ++rowIndex) {
@@ -155,18 +180,6 @@ public class Layer extends AbstractLayer {
         }
 
         return outputGradient;
-    }
-
-    @Override
-    protected DataList forward(final DataList inputRow) {
-        final DataList outputRow = new DataList(this.neurons.size());
-
-        for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
-            final double neuronOutput = this.neurons.get(neuronIndex).calculateOutput(inputRow);
-            outputRow.setValue(neuronIndex, neuronOutput);
-        }
-
-        return outputRow;
     }
 
     @Override

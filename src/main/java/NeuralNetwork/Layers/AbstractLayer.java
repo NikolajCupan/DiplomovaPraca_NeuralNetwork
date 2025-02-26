@@ -38,10 +38,11 @@ public abstract class AbstractLayer {
         return this.savedInputBatch.get();
     }
 
-    public abstract Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch);
-    public abstract Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch);
-    public abstract Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch);
-    protected abstract DataList calculateGradientWithRespectToInputs(final DataList inputGradient);
-
     protected abstract DataList forward(final DataList inputRow);
+    public abstract Batch backward(final Batch inputGradientBatch);
+
+    protected abstract Batch calculateGradientWithRespectToBiases(final Batch inputGradientBatch);
+    protected abstract Batch calculateGradientWithRespectToWeights(final Batch inputGradientBatch);
+    protected abstract Batch calculateGradientWithRespectToInputs(final Batch inputGradientBatch);
+    protected abstract DataList calculateGradientWithRespectToInputs(final DataList inputGradient);
 }
