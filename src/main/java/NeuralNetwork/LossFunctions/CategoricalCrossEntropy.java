@@ -7,21 +7,21 @@ import Utilities.CustomMath;
 public class CategoricalCrossEntropy implements ILossFunction {
     private static final double CLAMP_VALUE = 0.0000001;
 
-    public Batch backward(final Batch predictedBatch, final Batch targetBatch) {
-        final int predictedBatchRowsSize = predictedBatch.getRowsSize();
-        final int predictedBatchColumnsSize = predictedBatch.getColumnsSize();
+    public Batch backward(final Batch inputBatch, final Batch targetBatch) {
+        final int inputBatchRowsSize = inputBatch.getRowsSize();
+        final int inputBatchColumnsSize = inputBatch.getColumnsSize();
 
         final Batch gradientWRTInputs = new Batch();
 
-        for (int rowIndex = 0; rowIndex < predictedBatchRowsSize; ++rowIndex) {
-            final DataList predictedBatchRow = predictedBatch.getRow(rowIndex);
+        for (int rowIndex = 0; rowIndex < inputBatchRowsSize; ++rowIndex) {
+            final DataList inputBatchRow = inputBatch.getRow(rowIndex);
             final DataList targetBatchRow = targetBatch.getRow(rowIndex);
 
-            final DataList outputRow = new DataList(predictedBatchColumnsSize);
+            final DataList outputRow = new DataList(inputBatchColumnsSize);
 
-            for (int columnIndex = 0; columnIndex < predictedBatchColumnsSize; ++columnIndex) {
-                final double value = -targetBatchRow.getValue(columnIndex) / predictedBatchRow.getValue(columnIndex);
-                final double normalizedValue = value / predictedBatchRowsSize;
+            for (int columnIndex = 0; columnIndex < inputBatchColumnsSize; ++columnIndex) {
+                final double value = -targetBatchRow.getValue(columnIndex) / inputBatchRow.getValue(columnIndex);
+                final double normalizedValue = value / inputBatchRowsSize;
 
                 outputRow.setValue(columnIndex, normalizedValue);
             }

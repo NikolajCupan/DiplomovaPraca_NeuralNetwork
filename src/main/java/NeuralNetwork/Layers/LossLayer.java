@@ -53,7 +53,7 @@ public class LossLayer extends LayerBase {
     private Batch resolveCustomCalculateGradientWithRespectToInputs() {
         if (this.lossFunction instanceof final CategoricalCrossEntropy categoricalCrossEntropy) {
             return categoricalCrossEntropy.backward(
-                    this.getSavedOutputBatch(),
+                    this.getSavedInputBatch(),
                     this.getSavedTargetBatch()
             );
         } else {

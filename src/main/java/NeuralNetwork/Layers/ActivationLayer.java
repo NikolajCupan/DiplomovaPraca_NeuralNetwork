@@ -73,8 +73,11 @@ public class ActivationLayer extends LayerBase {
 
     private Batch resolveCustomCalculateGradientWithRespectToInputs(final GradientStruct inputGradientStruct) {
         if (this.activationFunction instanceof final Softmax softmaxActivationFunction) {
-            final Batch savedOutputBatch = this.getSavedInputBatch();
-            return softmaxActivationFunction.backward(inputGradientStruct, savedOutputBatch);
+            final Batch savedOutputBatch = this.getSavedOutputBatch();
+            return softmaxActivationFunction.backward(
+                    inputGradientStruct,
+                    savedOutputBatch
+            );
         } else {
             throw new IllegalArgumentException("Custom backward step is not available for this type of activation function");
         }
