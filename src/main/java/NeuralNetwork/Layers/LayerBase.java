@@ -22,6 +22,15 @@ public abstract class LayerBase {
         this.savedOutputGradientStruct = Optional.empty();
     }
 
+    public void clearState() {
+        this.savedInputBatch = Optional.empty();
+        this.savedOutputBatch = Optional.empty();
+        this.savedTargetBatch = Optional.empty();
+
+        this.savedInputGradientStruct = Optional.empty();
+        this.savedOutputGradientStruct = Optional.empty();
+    }
+
     public Batch getSavedInputBatch() {
         if (this.savedInputBatch.isEmpty()) {
             throw new IllegalArgumentException("Layer saved input batch is empty");

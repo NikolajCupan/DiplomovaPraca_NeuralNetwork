@@ -22,6 +22,14 @@ public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase {
     }
 
     @Override
+    public void clearState() {
+        super.clearState();
+
+        this.softmaxActivationLayer.clearState();
+        this.categoricalCrossEntropyLossLayer.clearState();
+    }
+
+    @Override
     public void forward(final Batch inputBatch) {
         this.setSavedInputBatch(inputBatch);
 

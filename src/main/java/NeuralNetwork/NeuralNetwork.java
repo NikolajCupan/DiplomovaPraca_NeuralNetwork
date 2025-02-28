@@ -1,12 +1,14 @@
 package NeuralNetwork;
 
 import NeuralNetwork.BuildingBlocks.Batch;
+import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
+import Utilities.CustomMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +73,19 @@ public class NeuralNetwork {
         }
 
         this.backwardStepExecuted = true;
+    }
+
+    public void clearState() {
+        if (!this.backwardStepExecuted) {
+            throw new RuntimeException("Cannot clear state before backward step");
+        }
+
+        this.forwardStepExecuted = false;
+        this.backwardStepExecuted = false;
+
+        for (final LayerBase layer : this.layers) {
+            layer.clearState();
+        }
     }
 
     public void addHiddenLayer(final HiddenLayer hiddenLayerToBeAdded) {
