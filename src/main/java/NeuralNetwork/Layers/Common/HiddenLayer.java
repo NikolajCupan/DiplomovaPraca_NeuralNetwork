@@ -1,8 +1,9 @@
-package NeuralNetwork.Layers;
+package NeuralNetwork.Layers.Common;
 
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.BuildingBlocks.Neuron;
+import NeuralNetwork.Layers.LayerBase;
 import Utilities.CustomMath;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
 

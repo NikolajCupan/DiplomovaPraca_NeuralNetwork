@@ -66,4 +66,36 @@ public class GradientStruct {
 
         this.gradientWithRespectToInputs = Optional.of(gradientWithRespectToInputs);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+
+        builder.append("{\n");
+
+        builder.append("\tGradient with respect to biases:\n");
+        if (this.gradientWithRespectToBiases.isEmpty()) {
+            builder.append("\t\t[EMPTY]\n");
+        } else {
+            builder.append(this.gradientWithRespectToBiases.get()).append("\n");
+        }
+
+        builder.append("\tGradient with respect to weights:\n");
+        if (this.gradientWithRespectToWeights.isEmpty()) {
+            builder.append("\t\t[EMPTY]\n");
+        } else {
+            builder.append(this.gradientWithRespectToWeights.get()).append("\n");
+        }
+
+        builder.append("\tGradient with respect to inputs:\n");
+        if (this.gradientWithRespectToInputs.isEmpty()) {
+            builder.append("\t\t[EMPTY]\n");
+        } else {
+            builder.append(this.gradientWithRespectToInputs.get()).append("\n");
+        }
+
+        builder.append("}");
+
+        return builder.toString();
+    }
 }

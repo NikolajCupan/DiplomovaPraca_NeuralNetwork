@@ -1,10 +1,11 @@
-package NeuralNetwork.Layers;
+package NeuralNetwork.Layers.Common;
 
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.ActivationFunctions.IActivationFunction;
 import NeuralNetwork.ActivationFunctions.Softmax;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
+import NeuralNetwork.Layers.LayerBase;
 
 public class ActivationLayer extends LayerBase {
     private final IActivationFunction activationFunction;

@@ -1,7 +1,8 @@
-package NeuralNetwork.Layers;
+package NeuralNetwork.Layers.Common;
 
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
+import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import NeuralNetwork.LossFunctions.ILossFunction;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
@@ -38,7 +39,7 @@ public class LossLayer extends LayerBase {
     @Override
     public void backward(final GradientStruct inputGradientStruct) {
         if (!inputGradientStruct.gradientStructIsEmpty()) {
-            throw new IllegalArgumentException("Loss layer input gradient struct must be empty");
+            throw new IllegalArgumentException("Input gradient struct in loss layer must be empty");
         }
         this.setSavedInputGradientStruct(inputGradientStruct);
 

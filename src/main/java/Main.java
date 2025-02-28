@@ -2,12 +2,13 @@ import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
 import NeuralNetwork.ActivationFunctions.Softmax;
-import NeuralNetwork.Layers.ActivationLayer;
-import NeuralNetwork.Layers.LossLayer;
+import NeuralNetwork.Layers.Common.ActivationLayer;
+import NeuralNetwork.Layers.Common.LossLayer;
+import NeuralNetwork.Layers.Specific.SoftmaxCategoricalCrossEntropyLayer;
 import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import NeuralNetwork.BuildingBlocks.Neuron;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
-import NeuralNetwork.Layers.HiddenLayer;
+import NeuralNetwork.Layers.Common.HiddenLayer;
 
 public class Main {
     public static Batch getInput() {
@@ -85,33 +86,55 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        final Batch input = Main.getInput();
-        final Batch targetOutput = Main.getOutput();
+        {
+            final Batch input = Main.getInput();
+            final Batch targetOutput = Main.getOutput();
 
-        final HiddenLayer hiddenLayer1 = Main.getLayer1();
-        final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
-        final HiddenLayer hiddenLayer2 = Main.getLayer2();
-        final ActivationLayer softmax = new ActivationLayer(new Softmax());
-        final LossLayer ccEntropy = new LossLayer(new CategoricalCrossEntropy());
+            final HiddenLayer hiddenLayer1 = Main.getLayer1();
+            final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
+            final HiddenLayer hiddenLayer2 = Main.getLayer2();
+            final ActivationLayer softmax = new ActivationLayer(new Softmax());
+            final LossLayer ccEntropy = new LossLayer(new CategoricalCrossEntropy());
 
-        hiddenLayer1.forward(input);
-        relu.forward(hiddenLayer1.getSavedOutputBatch());
-        hiddenLayer2.forward(relu.getSavedOutputBatch());
-        softmax.forward(hiddenLayer2.getSavedOutputBatch());
+            hiddenLayer1.forward(input);
+            relu.forward(hiddenLayer1.getSavedOutputBatch());
+            hiddenLayer2.forward(relu.getSavedOutputBatch());
+            softmax.forward(hiddenLayer2.getSavedOutputBatch());
+            ccEntropy.setSavedTargetBatch(targetOutput);
+            ccEntropy.forward(softmax.getSavedOutputBatch());
 
-        ccEntropy.setSavedTargetBatch(targetOutput);
-        ccEntropy.forward(softmax.getSavedOutputBatch());
+            ccEntropy.backward(new GradientStruct());
+            softmax.backward(ccEntropy.getSavedOutputGradientStruct());
+            hiddenLayer2.backward(softmax.getSavedOutputGradientStruct());
+            relu.backward(hiddenLayer2.getSavedOutputGradientStruct());
+            hiddenLayer1.backward(relu.getSavedOutputGradientStruct());
 
-        ccEntropy.backward(new GradientStruct());
-        softmax.backward(ccEntropy.getSavedOutputGradientStruct());
-        hiddenLayer2.backward(softmax.getSavedOutputGradientStruct());
-        relu.backward(hiddenLayer2.getSavedOutputGradientStruct());
-        hiddenLayer1.backward(relu.getSavedOutputGradientStruct());
+            System.out.println(hiddenLayer1.getSavedOutputGradientStruct());
+        }
 
-        System.out.println(hiddenLayer1);
-        System.out.println(relu);
-        System.out.println(hiddenLayer2);
-        System.out.println(softmax);
-        System.out.println(ccEntropy);
+        System.out.println("\n\n\n");
+
+        {
+            final Batch input = Main.getInput();
+            final Batch targetOutput = Main.getOutput();
+
+            final HiddenLayer hiddenLayer1 = Main.getLayer1();
+            final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
+            final HiddenLayer hiddenLayer2 = Main.getLayer2();
+            final SoftmaxCategoricalCrossEntropyLayer softmaxCCE = new SoftmaxCategoricalCrossEntropyLayer();
+
+            hiddenLayer1.forward(input);
+            relu.forward(hiddenLayer1.getSavedOutputBatch());
+            hiddenLayer2.forward(relu.getSavedOutputBatch());
+            softmaxCCE.setSavedTargetBatch(targetOutput);
+            softmaxCCE.forward(hiddenLayer2.getSavedOutputBatch());
+
+            softmaxCCE.backward(new GradientStruct());
+            hiddenLayer2.backward(softmaxCCE.getSavedOutputGradientStruct());
+            relu.backward(hiddenLayer2.getSavedOutputGradientStruct());
+            hiddenLayer1.backward(relu.getSavedOutputGradientStruct());
+
+            System.out.println(hiddenLayer1.getSavedOutputGradientStruct());
+        }
     }
 }
