@@ -26,6 +26,14 @@ public class NeuralNetwork {
         this.backwardStepExecuted = false;
     }
 
+    public boolean isBackwardStepExecuted() {
+        return this.backwardStepExecuted;
+    }
+
+    public List<LayerBase> getLayers() {
+        return this.layers;
+    }
+
     public void forward(final Batch inputBatch, final Batch targetBatch) {
         if (!this.isLastLayerSuitable()) {
             throw new RuntimeException("Cannot perform forward method, last layer is not suitable");
@@ -63,19 +71,6 @@ public class NeuralNetwork {
         }
 
         this.backwardStepExecuted = true;
-    }
-
-    public void optimize() {
-        if (!this.backwardStepExecuted) {
-            throw new RuntimeException("Cannot perform optimization step before backward step");
-        }
-
-        for (final LayerBase layer : this.layers) {
-            if (layer instanceof final HiddenLayer hiddenLayer) {
-                hiddenLayer.optimizeBiases();
-                hiddenLayer.optimizeWeights();
-            }
-        }
     }
 
     public void addHiddenLayer(final HiddenLayer hiddenLayerToBeAdded) {

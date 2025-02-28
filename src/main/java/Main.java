@@ -6,6 +6,7 @@ import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
 import NeuralNetwork.BuildingBlocks.Neuron;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.NeuralNetwork;
+import NeuralNetwork.Optimizers.StochasticGradientDescent;
 
 public class Main {
     public static HiddenLayer getHiddenLayer1() {
@@ -103,7 +104,9 @@ public class Main {
         final NeuralNetwork neuralNetwork = Main.getNeuralNetwork();
         neuralNetwork.forward(inputBatch, targetBatch);
         neuralNetwork.backward();
-        neuralNetwork.optimize();
+
+        final StochasticGradientDescent optimizer = new StochasticGradientDescent(neuralNetwork, 1, 1);
+        optimizer.optimize();
 
         int x = 100;
     }
