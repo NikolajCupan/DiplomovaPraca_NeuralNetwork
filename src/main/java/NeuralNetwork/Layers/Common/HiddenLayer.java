@@ -30,6 +30,28 @@ public class HiddenLayer extends LayerBase {
         this.neurons.add(neuron);
     }
 
+    public void optimizeBiases() {
+        final DataList gradientWRTBiases = this.getSavedOutputGradientStruct().getGradientWithRespectToBiases().getRow(0);
+
+        for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
+            final Neuron neuron = this.neurons.get(neuronIndex);
+            final double gradientValue = gradientWRTBiases.getValue(neuronIndex);
+
+            neuron.optimizeBias(gradientValue);
+        }
+    }
+
+    public void optimizeWeights() {
+        final Batch gradientWRTWeights = this.getSavedOutputGradientStruct().getGradientWithRespectToWeights();
+
+        for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
+            final Neuron neuron = this.neurons.get(neuronIndex);
+            final DataList gradient = gradientWRTWeights.getColumn(neuronIndex);
+
+            neuron.optimizeWeight(gradient);
+        }
+    }
+
     public int getNeuronsSize() {
         return this.neurons.size();
     }

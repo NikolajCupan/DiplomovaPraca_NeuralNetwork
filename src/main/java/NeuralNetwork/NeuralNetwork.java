@@ -65,6 +65,19 @@ public class NeuralNetwork {
         this.backwardStepExecuted = true;
     }
 
+    public void optimize() {
+        if (!this.backwardStepExecuted) {
+            throw new RuntimeException("Cannot perform optimization step before backward step");
+        }
+
+        for (final LayerBase layer : this.layers) {
+            if (layer instanceof final HiddenLayer hiddenLayer) {
+                hiddenLayer.optimizeBiases();
+                hiddenLayer.optimizeWeights();
+            }
+        }
+    }
+
     public void addHiddenLayer(final HiddenLayer hiddenLayerToBeAdded) {
         if (this.layers.isEmpty()) {
             final int firstLayerWeightsSize = hiddenLayerToBeAdded.getWeightsSize();

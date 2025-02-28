@@ -32,11 +32,11 @@ public class Neuron {
         this.weights = weights;
     }
 
-    public void updateBias(final double gradientValue) {
+    public void optimizeBias(final double gradientValue) {
         this.bias += -Neuron.BIAS_LEARNING_RATE * gradientValue;
     }
 
-    public void updateWeights(final DataList gradient) {
+    public void optimizeWeight(final DataList gradient) {
         for (int i = 0; i < this.weights.getDataListSize(); ++i) {
             final double originalWeightValue = this.weights.getValue(i);
             final double updatedWeightValue = originalWeightValue + (-Neuron.WEIGHTS_LEARNING_RATE * gradient.getValue(i));

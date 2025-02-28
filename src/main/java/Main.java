@@ -103,6 +103,7 @@ public class Main {
         final NeuralNetwork neuralNetwork = Main.getNeuralNetwork();
         neuralNetwork.forward(inputBatch, targetBatch);
         neuralNetwork.backward();
+        neuralNetwork.optimize();
 
         int x = 100;
     }
