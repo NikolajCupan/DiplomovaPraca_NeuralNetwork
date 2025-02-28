@@ -60,4 +60,11 @@ public class LossLayer extends LayerBase {
             throw new IllegalArgumentException("Custom backward step is not available for this type of loss function");
         }
     }
+
+    @Override
+    public String toString() {
+        return "{\n\tLoss layer: loss function [" +
+                this.lossFunction +
+                "]\n}";
+    }
 }

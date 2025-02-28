@@ -17,6 +17,7 @@ public abstract class LayerBase {
         this.savedInputBatch = Optional.empty();
         this.savedOutputBatch = Optional.empty();
         this.savedTargetBatch = Optional.empty();
+
         this.savedInputGradientStruct = Optional.empty();
         this.savedOutputGradientStruct = Optional.empty();
     }

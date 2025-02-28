@@ -108,6 +108,10 @@ public class Main {
         relu.backward(hiddenLayer2.getSavedOutputGradientStruct());
         hiddenLayer1.backward(relu.getSavedOutputGradientStruct());
 
-        System.out.println("");
+        System.out.println(hiddenLayer1);
+        System.out.println(relu);
+        System.out.println(hiddenLayer2);
+        System.out.println(softmax);
+        System.out.println(ccEntropy);
     }
 }

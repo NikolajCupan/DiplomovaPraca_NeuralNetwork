@@ -82,4 +82,11 @@ public class ActivationLayer extends LayerBase {
             throw new IllegalArgumentException("Custom backward step is not available for this type of activation function");
         }
     }
+
+    @Override
+    public String toString() {
+        return "{\n\tActivation layer: activation function [" +
+                this.activationFunction +
+                "]\n}";
+    }
 }

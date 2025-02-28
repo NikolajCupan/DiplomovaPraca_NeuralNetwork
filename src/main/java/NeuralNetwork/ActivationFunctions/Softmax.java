@@ -79,4 +79,9 @@ public class Softmax implements IActivationFunction {
 
         return gradientWRTInputs;
     }
+
+    @Override
+    public String toString() {
+        return "Softmax";
+    }
 }

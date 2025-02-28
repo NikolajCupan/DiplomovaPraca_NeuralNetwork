@@ -21,4 +21,9 @@ public class RectifiedLinearUnit implements IActivationFunction {
     public double derivative(final double input) {
         return input <= 0 ? 0 : 1;
     }
+
+    @Override
+    public String toString() {
+        return "Rectified linear unit";
+    }
 }

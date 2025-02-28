@@ -49,4 +49,9 @@ public class CategoricalCrossEntropy implements ILossFunction {
         final double clampedValue = Math.clamp(predictedValue, CLAMP_VALUE, 1.0 - CLAMP_VALUE);
         return -Math.log(clampedValue);
     }
+
+    @Override
+    public String toString() {
+        return "Categorical cross entropy";
+    }
 }

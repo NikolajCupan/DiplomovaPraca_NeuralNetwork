@@ -6,20 +6,17 @@ public class GradientStruct {
     private Optional<Batch> gradientWithRespectToBiases;
     private Optional<Batch> gradientWithRespectToWeights;
     private Optional<Batch> gradientWithRespectToInputs;
-    private Optional<Batch> gradientWithRespectToOutputs;
 
     public GradientStruct() {
         this.gradientWithRespectToBiases = Optional.empty();
         this.gradientWithRespectToWeights = Optional.empty();
         this.gradientWithRespectToInputs = Optional.empty();
-        this.gradientWithRespectToOutputs = Optional.empty();
     }
 
     public boolean gradientStructIsEmpty() {
         return this.gradientWithRespectToBiases.isEmpty()
                 && this.gradientWithRespectToWeights.isEmpty()
-                && this.gradientWithRespectToInputs.isEmpty()
-                && this.gradientWithRespectToOutputs.isEmpty();
+                && this.gradientWithRespectToInputs.isEmpty();
     }
 
     public Batch getGradientWithRespectToBiases() {
@@ -46,14 +43,6 @@ public class GradientStruct {
         return this.gradientWithRespectToInputs.get();
     }
 
-    public Optional<Batch> getGradientWithRespectToOutputs() {
-        if (this.gradientWithRespectToOutputs.isEmpty()) {
-            throw new IllegalArgumentException("Gradient with respect to outputs is empty");
-        }
-
-        return this.gradientWithRespectToOutputs;
-    }
-
     public void setGradientWithRespectToBiases(final Batch gradientWithRespectToBiases) {
         if (this.gradientWithRespectToBiases.isPresent()) {
             throw new IllegalArgumentException("Gradient with respect to biases is already set");
@@ -76,13 +65,5 @@ public class GradientStruct {
         }
 
         this.gradientWithRespectToInputs = Optional.of(gradientWithRespectToInputs);
-    }
-
-    public void setGradientWithRespectToOutputs(final Batch gradientWithRespectToOutputs) {
-        if (this.gradientWithRespectToOutputs.isPresent()) {
-            throw new IllegalArgumentException("Gradient with respect to outputs is already set");
-        }
-
-        this.gradientWithRespectToOutputs = Optional.of(gradientWithRespectToOutputs);
     }
 }

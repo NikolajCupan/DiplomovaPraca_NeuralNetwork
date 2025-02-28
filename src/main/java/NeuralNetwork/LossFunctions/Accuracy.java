@@ -21,4 +21,9 @@ public class Accuracy implements ILossFunction {
 
         return predictedRowArgMax == targetRowArgMax ? 1.0 : 0.0;
     }
+
+    @Override
+    public String toString() {
+        return "Accuracy";
+    }
 }
