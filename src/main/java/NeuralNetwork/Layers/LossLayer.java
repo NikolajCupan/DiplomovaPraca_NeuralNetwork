@@ -18,13 +18,12 @@ public class LossLayer extends LayerBase {
     public void forward(final Batch inputBatch) {
         this.setSavedInputBatch(inputBatch);
 
-        final Batch predictedBatch = inputBatch;
         final Batch savedTargetBatch = this.getSavedTargetBatch();
 
-        final DataList outputRow = new DataList(predictedBatch.getRowsSize());
+        final DataList outputRow = new DataList(inputBatch.getRowsSize());
 
-        for (int i = 0; i < predictedBatch.getRowsSize(); ++i) {
-            final DataList predictedRow = predictedBatch.getRow(i);
+        for (int i = 0; i < inputBatch.getRowsSize(); ++i) {
+            final DataList predictedRow = inputBatch.getRow(i);
             final DataList targetRow = savedTargetBatch.getRow(i);
 
             final double loss = this.lossFunction.loss(predictedRow, targetRow);

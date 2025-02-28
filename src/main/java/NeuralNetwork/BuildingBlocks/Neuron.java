@@ -67,13 +67,9 @@ public class Neuron {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-
-        builder.append("Neuron: bias [");
-        builder.append(this.bias);
-        builder.append("], weights ");
-        builder.append(this.weights);
-
-        return builder.toString();
+        return "Neuron: bias [" +
+                this.bias +
+                "], weights " +
+                this.weights;
     }
 }
