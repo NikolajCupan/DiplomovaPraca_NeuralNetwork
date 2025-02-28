@@ -30,6 +30,18 @@ public class HiddenLayer extends LayerBase {
         this.neurons.add(neuron);
     }
 
+    public int getNeuronsSize() {
+        return this.neurons.size();
+    }
+
+    public int getWeightsSize() {
+        if (this.neurons.isEmpty()) {
+            throw new IllegalArgumentException("Hidden layer has no neurons, cannot return weights size");
+        }
+
+        return this.neurons.getFirst().getWeightsSize();
+    }
+
     @Override
     public void forward(final Batch inputBatch) {
         this.setSavedInputBatch(inputBatch);

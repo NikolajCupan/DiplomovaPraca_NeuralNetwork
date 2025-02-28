@@ -1,4 +1,4 @@
-package NeuralNetwork.Layers.Specific;
+package NeuralNetwork.Layers.Special;
 
 import NeuralNetwork.ActivationFunctions.Softmax;
 import NeuralNetwork.BuildingBlocks.Batch;
@@ -71,5 +71,13 @@ public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase {
         final GradientStruct gradientStruct = new GradientStruct();
         gradientStruct.setGradientWithRespectToInputs(gradientWRTInputs);
         this.setSavedOutputGradientStruct(gradientStruct);
+    }
+
+    @Override
+    public String toString() {
+        return "{\n\tActivation loss layer" +
+                "\n" + this.softmaxActivationLayer +
+                "\n" + this.categoricalCrossEntropyLossLayer +
+                "\n}";
     }
 }
