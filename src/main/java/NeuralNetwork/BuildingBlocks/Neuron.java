@@ -10,12 +10,23 @@ public class Neuron {
     private double bias;
     private final DataList weights;
 
-    public Neuron(final int weightsSize, final long seed) {
-        final Random random = new Random(seed);
-
+    public Neuron(final int weightsSize) {
         this.bias = 0.0;
         this.weights = new DataList(weightsSize);
 
+        final Random random = new Random();
+        this.initializeWeightsRandomly(weightsSize, random);
+    }
+
+    public Neuron(final int weightsSize, final Long seed) {
+        this.bias = 0.0;
+        this.weights = new DataList(weightsSize);
+
+        final Random random = new Random(seed);
+        this.initializeWeightsRandomly(weightsSize, random);
+    }
+
+    private void initializeWeightsRandomly(final int weightsSize, final Random random) {
         for (int i = 0; i < weightsSize; ++i) {
             this.weights.setValue(
                     i,

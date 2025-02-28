@@ -18,6 +18,16 @@ public class HiddenLayer extends LayerBase {
         this.neurons = new ArrayList<>();
     }
 
+    public HiddenLayer(final int weightsSize, final int neuronsSize) {
+        super();
+        this.neurons = new ArrayList<>();
+
+        for (int i = 0; i < neuronsSize; ++i) {
+            final Neuron neuron = new Neuron(weightsSize);
+            this.neurons.add(neuron);
+        }
+    }
+
     public void addNeuron(final Neuron neuron) {
         if (!this.neurons.isEmpty()) {
             final int weightsSize = this.neurons.getFirst().getWeightsSize();
