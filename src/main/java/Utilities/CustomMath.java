@@ -1,7 +1,11 @@
 package Utilities;
 
-import NeuralNetwork.Batch;
-import NeuralNetwork.DataList;
+import NeuralNetwork.BuildingBlocks.Batch;
+import NeuralNetwork.BuildingBlocks.DataList;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class CustomMath {
     public static double dotProduct(
@@ -106,5 +110,30 @@ public class CustomMath {
         }
 
         return sum;
+    }
+
+    public static double max(final DataList inputList) {
+        final Double[] values = inputList.getDataListRawValues();
+        final List<Double> list = Arrays.asList(values);
+        return Collections.max(list);
+    }
+
+    // INPUT:         OUTPUT:
+    // [ 1, 2, 3 ] -> [ 1, 0, 0 ]
+    //                [ 0, 2, 0 ]
+    //                [ 0, 0, 3 ]
+    public static Batch diagonalMatrix(final DataList list) {
+        final Batch matrix = new Batch();
+        final int size = list.getDataListSize();
+
+        for (int i = 0; i < size; ++i) {
+            final DataList row = new DataList(size);
+            row.fill(0);
+
+            row.setValue(i, list.getValue(i));
+            matrix.addRow(row);
+        }
+
+        return matrix;
     }
 }
