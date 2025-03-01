@@ -28,7 +28,7 @@ public class Main {
         final Batch targetBatch = Factory.getTargetBatch();
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
-        final StochasticGradientDescent optimizer = new StochasticGradientDescent(neuralNetwork, 1.0, 0.1, 1.0, 0.1);
+        final StochasticGradientDescent optimizer = new StochasticGradientDescent(neuralNetwork, 1.0, 0.001);
 
         for (int i = 0; i < 50_000; ++i) {
             boolean printing = false;
@@ -49,9 +49,8 @@ public class Main {
             neuralNetwork.clearState();
 
             if (printing) {
-                final double biasesLearningRate = optimizer.getCurrentBiasesLearningRate();
-                final double weightsLearningRate = optimizer.getCurrentWeightsLearningRate();
-                System.out.println(", lr biases: " + biasesLearningRate + ", lr weights: " + weightsLearningRate);
+                final double learningRate = optimizer.getCurrentLearningRate();
+                System.out.println(", lr: " + learningRate);
             }
          }
 
