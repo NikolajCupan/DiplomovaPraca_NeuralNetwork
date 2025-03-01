@@ -1,40 +1,21 @@
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.NeuralNetwork;
-import NeuralNetwork.Optimizers.StochasticGradientDescent;
+import NeuralNetwork.Optimizers.StochasticGradientDescentWithMomentum;
 import Utilities.Factory;
 
 public class Main {
     public static void main(String[] args) {
-//        final double startingLearningRate = 1.0;
-//        final double learningRateDecay = 0.1;
-//        final int stepsSize = 10_000;
-//        final int printEach = 100;
-//
-//        for (int step = 0; step <= stepsSize; ++step) {
-//            if (step % printEach == 0) {
-//                final double learningRate =
-//                        startingLearningRate * (1 / (1 + learningRateDecay * step));
-//                System.out.println(step + " " + learningRate);
-//            }
-//        }
-//
-//        if (1 == 1) {
-//            return;
-//        }
-
         final long startTime = System.currentTimeMillis();
 
         final Batch inputBatch = Factory.getInputBatch();
         final Batch targetBatch = Factory.getTargetBatch();
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
-        final StochasticGradientDescent optimizer = new StochasticGradientDescent(neuralNetwork, 1.0, 0.001);
+        final StochasticGradientDescentWithMomentum optimizer =
+                new StochasticGradientDescentWithMomentum(neuralNetwork, 1.0, 0.001, 0.9);
 
-        for (int i = 0; i < 50_000; ++i) {
-            boolean printing = false;
-            if (i % 1_000 == 0) {
-                printing = true;
-            }
+        for (int i = 0; i < 2_501; ++i) {
+            boolean printing = i % 500 == 0;
 
             neuralNetwork.forward(inputBatch, targetBatch);
 
@@ -45,7 +26,7 @@ public class Main {
             }
 
             neuralNetwork.backward();
-            optimizer.optimize();
+            optimizer.performOptimization();
             neuralNetwork.clearState();
 
             if (printing) {

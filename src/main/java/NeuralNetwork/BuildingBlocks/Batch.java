@@ -10,6 +10,17 @@ public class Batch {
         this.batch = new ArrayList<>();
     }
 
+    public Batch(final int rowsSize, final int columnsSize) {
+        this.batch = new ArrayList<>();
+
+        for (int rowIndex = 0; rowIndex < rowsSize; ++rowIndex) {
+            final DataList row = new DataList(columnsSize);
+            row.fill(0.0);
+
+            this.batch.add(row);
+        }
+    }
+
     public void addRow(final DataList rowToBeAdded) {
         if (!this.batch.isEmpty()) {
             final int rowsSize = this.batch.getFirst().getDataListSize();

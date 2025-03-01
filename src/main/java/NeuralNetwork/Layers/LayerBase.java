@@ -2,10 +2,13 @@ package NeuralNetwork.Layers;
 
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
+import Utilities.Identifier;
 
 import java.util.Optional;
 
 public abstract class LayerBase {
+    private final long id;
+
     private Optional<Batch> savedInputBatch;
     private Optional<Batch> savedOutputBatch;
     private Optional<Batch> savedTargetBatch;
@@ -14,6 +17,8 @@ public abstract class LayerBase {
     private Optional<GradientStruct> savedOutputGradientStruct;
 
     protected LayerBase() {
+        this.id = Identifier.getId();
+
         this.savedInputBatch = Optional.empty();
         this.savedOutputBatch = Optional.empty();
         this.savedTargetBatch = Optional.empty();
@@ -29,6 +34,10 @@ public abstract class LayerBase {
 
         this.savedInputGradientStruct = Optional.empty();
         this.savedOutputGradientStruct = Optional.empty();
+    }
+
+    public long getId() {
+        return this.id;
     }
 
     public Batch getSavedInputBatch() {
