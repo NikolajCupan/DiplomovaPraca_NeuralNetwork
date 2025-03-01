@@ -5,27 +5,55 @@ import Utilities.Factory;
 
 public class Main {
     public static void main(String[] args) {
+//        final double startingLearningRate = 1.0;
+//        final double learningRateDecay = 0.1;
+//        final int stepsSize = 10_000;
+//        final int printEach = 100;
+//
+//        for (int step = 0; step <= stepsSize; ++step) {
+//            if (step % printEach == 0) {
+//                final double learningRate =
+//                        startingLearningRate * (1 / (1 + learningRateDecay * step));
+//                System.out.println(step + " " + learningRate);
+//            }
+//        }
+//
+//        if (1 == 1) {
+//            return;
+//        }
+
         final long startTime = System.currentTimeMillis();
 
         final Batch inputBatch = Factory.getInputBatch();
         final Batch targetBatch = Factory.getTargetBatch();
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
-        final StochasticGradientDescent optimizer = new StochasticGradientDescent(neuralNetwork, 1, 1);
+        final StochasticGradientDescent optimizer = new StochasticGradientDescent(neuralNetwork, 1.0, 0.1, 1.0, 0.1);
 
-        for (int i = 0; i < 10_000; ++i) {
+        for (int i = 0; i < 50_000; ++i) {
+            boolean printing = false;
+            if (i % 1_000 == 0) {
+                printing = true;
+            }
+
             neuralNetwork.forward(inputBatch, targetBatch);
 
-            if (i % 1_000 == 0) {
-                final double loss = neuralNetwork.getLoss();
+            if (printing) {
                 final double accuracy = neuralNetwork.getAccuracy();
-                System.out.println("epoch: "  + i + ", accuracy: " + accuracy + ", loss: " + loss);
+                final double loss = neuralNetwork.getLoss();
+                System.out.print("epoch: "  + i + ", accuracy: " + accuracy + ", loss: " + loss);
             }
 
             neuralNetwork.backward();
             optimizer.optimize();
             neuralNetwork.clearState();
-        }
+
+            if (printing) {
+                final double biasesLearningRate = optimizer.getCurrentBiasesLearningRate();
+                final double weightsLearningRate = optimizer.getCurrentWeightsLearningRate();
+                System.out.println(", lr biases: " + biasesLearningRate + ", lr weights: " + weightsLearningRate);
+            }
+         }
 
         final long endTime = System.currentTimeMillis();
         System.out.println("Time needed: " + (endTime - startTime) + " ms");
