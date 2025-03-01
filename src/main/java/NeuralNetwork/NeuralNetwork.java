@@ -1,14 +1,14 @@
 package NeuralNetwork;
 
 import NeuralNetwork.BuildingBlocks.Batch;
-import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
+import NeuralNetwork.Layers.IAccuracyLayerBase;
+import NeuralNetwork.Layers.ILossLayerBase;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
-import Utilities.CustomMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,34 @@ public class NeuralNetwork {
 
         this.forwardStepExecuted = false;
         this.backwardStepExecuted = false;
+    }
+
+    public double getAccuracy() {
+        if (!this.forwardStepExecuted) {
+            throw new RuntimeException("Cannot calculate accuracy before forward step");
+        }
+
+        final LayerBase lastLayer = this.layers.getLast();
+
+        if (lastLayer instanceof final IAccuracyLayerBase lossLayer) {
+            return lossLayer.getAccuracy();
+        } else {
+            throw new RuntimeException("Last layer cannot be used to calculate accuracy");
+        }
+    }
+
+    public double getLoss() {
+        if (!this.forwardStepExecuted) {
+            throw new RuntimeException("Cannot calculate loss before forward step");
+        }
+
+        final LayerBase lastLayer = this.layers.getLast();
+
+        if (lastLayer instanceof final ILossLayerBase lossLayer) {
+            return lossLayer.getLoss();
+        } else {
+            throw new RuntimeException("Last layer cannot be used to calculate loss");
+        }
     }
 
     public boolean isBackwardStepExecuted() {

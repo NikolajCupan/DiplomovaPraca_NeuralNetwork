@@ -6,11 +6,13 @@ import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
+import NeuralNetwork.Layers.IAccuracyLayerBase;
+import NeuralNetwork.Layers.ILossLayerBase;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import Utilities.CustomMath;
 
-public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase {
+public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase implements IAccuracyLayerBase, ILossLayerBase {
     private final ActivationLayer softmaxActivationLayer;
     private final LossLayer categoricalCrossEntropyLossLayer;
 
@@ -19,6 +21,36 @@ public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase {
 
         this.softmaxActivationLayer = new ActivationLayer(new Softmax());
         this.categoricalCrossEntropyLossLayer = new LossLayer(new CategoricalCrossEntropy());
+    }
+
+    @Override
+    public double getAccuracy() {
+        final Batch predictedBatch = this.softmaxActivationLayer.getSavedOutputBatch();
+        final Batch targetBatch = this.getSavedTargetBatch();
+        assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
+
+        final int rowsSize = predictedBatch.getRowsSize();
+        int correctPredictionsSize = 0;
+
+        for (int rowIndex = 0; rowIndex < rowsSize; ++rowIndex) {
+            final DataList predictedRow = predictedBatch.getRow(rowIndex);
+            final DataList targetRow = targetBatch.getRow(rowIndex);
+
+            final int predictedRowArgMax = CustomMath.argMax(predictedRow);
+            final int targetRowArgMax = CustomMath.argMax(targetRow);
+
+            if (predictedRowArgMax == targetRowArgMax) {
+                ++correctPredictionsSize;
+            }
+        }
+
+        return (double)correctPredictionsSize / rowsSize;
+    }
+
+    @Override
+    public double getLoss() {
+        final DataList savedOutput = this.getSavedOutputBatch().getRow(0);
+        return CustomMath.mean(savedOutput);
     }
 
     @Override
