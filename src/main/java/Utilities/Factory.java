@@ -1,11 +1,14 @@
 package Utilities;
 
 import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
+import NeuralNetwork.ActivationFunctions.Softmax;
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
+import NeuralNetwork.Layers.Common.LossLayer;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
+import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import NeuralNetwork.NeuralNetwork;
 
 public class Factory {
@@ -1229,12 +1232,16 @@ public class Factory {
         final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 64);
         final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
         final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 3);
+        // final ActivationLayer softmax = new ActivationLayer(new Softmax());
+        // final LossLayer ccentropy = new LossLayer(new CategoricalCrossEntropy());
         final SoftmaxCategoricalCrossEntropyLayer softmaxCCE = new SoftmaxCategoricalCrossEntropyLayer();
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(2);
         neuralNetwork.addHiddenLayer(hiddenLayer1);
         neuralNetwork.addActivationLayer(relu);
         neuralNetwork.addHiddenLayer(hiddenLayer2);
+        // neuralNetwork.addActivationLayer(softmax);
+        // neuralNetwork.addLossLayer(ccentropy);
         neuralNetwork.addSpecialLayer(softmaxCCE);
         return neuralNetwork;
     }

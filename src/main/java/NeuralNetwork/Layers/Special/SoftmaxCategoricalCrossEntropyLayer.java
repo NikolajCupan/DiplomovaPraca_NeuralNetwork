@@ -25,32 +25,12 @@ public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase implements IA
 
     @Override
     public double getAccuracy() {
-        final Batch predictedBatch = this.softmaxActivationLayer.getSavedOutputBatch();
-        final Batch targetBatch = this.getSavedTargetBatch();
-        assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
-
-        final int rowsSize = predictedBatch.getRowsSize();
-        int correctPredictionsSize = 0;
-
-        for (int rowIndex = 0; rowIndex < rowsSize; ++rowIndex) {
-            final DataList predictedRow = predictedBatch.getRow(rowIndex);
-            final DataList targetRow = targetBatch.getRow(rowIndex);
-
-            final int predictedRowArgMax = CustomMath.argMax(predictedRow);
-            final int targetRowArgMax = CustomMath.argMax(targetRow);
-
-            if (predictedRowArgMax == targetRowArgMax) {
-                ++correctPredictionsSize;
-            }
-        }
-
-        return (double)correctPredictionsSize / rowsSize;
+        return this.categoricalCrossEntropyLossLayer.getAccuracy();
     }
 
     @Override
     public double getLoss() {
-        final DataList savedOutput = this.getSavedOutputBatch().getRow(0);
-        return CustomMath.mean(savedOutput);
+        return this.categoricalCrossEntropyLossLayer.getLoss();
     }
 
     @Override
