@@ -3,17 +3,17 @@ package Utilities;
 public class Helper {
     private static final int DECIMAL_POINTS_PRINTED = 3;
 
-    public static <T extends Number> String stringifyArray(final T[] array) {
+    public static String stringifyArray(final double[] array) {
         final StringBuilder builder = new StringBuilder();
         builder.append("[   ");
 
         boolean first = true;
-        for (final T element : array) {
+        for (final double value : array) {
             if (!first) {
                 builder.append("   ");
             }
 
-            builder.append(Helper.formatNumber(element));
+            builder.append(Helper.formatNumber(value));
             first = false;
         }
 
@@ -22,11 +22,7 @@ public class Helper {
         return builder.toString();
     }
 
-    private static <T extends Number> String formatNumber(final T number) {
-        if (number instanceof Double || number instanceof Float) {
-            return String.format("%." + Helper.DECIMAL_POINTS_PRINTED + "f", number.doubleValue());
-        } else {
-            return number.toString();
-        }
+    private static String formatNumber(final double value) {
+        return String.format("%." + Helper.DECIMAL_POINTS_PRINTED + "f", value);
     }
 }

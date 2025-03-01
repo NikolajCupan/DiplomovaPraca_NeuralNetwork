@@ -13,7 +13,7 @@ public class Softmax implements IActivationFunction {
 
     @Override
     public DataList activate(final DataList inputList) {
-        final Double[] expValues = new Double[inputList.getDataListSize()];
+        final double[] expValues = new double[inputList.getDataListSize()];
         final double max = CustomMath.max(inputList);
 
         for (int i = 0; i < inputList.getDataListSize(); ++i) {

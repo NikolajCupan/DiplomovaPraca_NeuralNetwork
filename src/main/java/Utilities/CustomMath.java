@@ -3,14 +3,10 @@ package Utilities;
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 public class CustomMath {
     public static double dotProduct(
-            final Double[] left,
-            final Double[] right
+            final double[] left,
+            final double[] right
     ) {
         if (left.length != right.length) {
             throw new IllegalArgumentException("Size of left input [" + left.length + "] is not equal to size of right input [" + right.length + "]");
@@ -59,7 +55,7 @@ public class CustomMath {
             throw new IllegalArgumentException("Data list is empty");
         }
 
-        final Double[] dataListValues = list.getDataListRawValues();
+        final double[] dataListValues = list.getDataListRawValues();
 
         double max = dataListValues[0];
         int maxIndex = 0;
@@ -102,10 +98,10 @@ public class CustomMath {
         return CustomMath.sum(list.getDataListRawValues());
     }
 
-    public static double sum(final Double[] values) {
+    public static double sum(final double[] values) {
         double sum = 0.0;
 
-        for (final Double value : values) {
+        for (final double value : values) {
             sum += value;
         }
 
@@ -113,9 +109,19 @@ public class CustomMath {
     }
 
     public static double max(final DataList inputList) {
-        final Double[] values = inputList.getDataListRawValues();
-        final List<Double> list = Arrays.asList(values);
-        return Collections.max(list);
+        final double[] values = inputList.getDataListRawValues();
+        if (values.length == 0) {
+            throw new IllegalArgumentException("Data list is empty, cannot calculate max");
+        }
+
+        double maxValue = values[0];
+        for (final double value : values) {
+            if (value > maxValue) {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
     }
 
     // INPUT:         OUTPUT:

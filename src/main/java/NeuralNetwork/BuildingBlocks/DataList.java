@@ -5,13 +5,13 @@ import Utilities.Helper;
 import java.util.Arrays;
 
 public class DataList {
-    private final Double[] dataValues;
+    private final double[] dataValues;
 
     public DataList(final int size) {
-        this.dataValues = new Double[size];
+        this.dataValues = new double[size];
     }
 
-    public DataList(final Double[] dataValues) {
+    public DataList(final double[] dataValues) {
         this.dataValues = dataValues;
     }
 
@@ -27,7 +27,7 @@ public class DataList {
         return this.dataValues.length == 0;
     }
 
-    public Double[] getDataListRawValues() {
+    public double[] getDataListRawValues() {
         return this.dataValues;
     }
 

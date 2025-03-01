@@ -18,7 +18,7 @@ public class Neuron {
         this.initializeWeightsRandomly(weightsSize, random);
     }
 
-    public Neuron(final int weightsSize, final Long seed) {
+    public Neuron(final int weightsSize, final long seed) {
         this.bias = 0.0;
         this.weights = new DataList(weightsSize);
 
