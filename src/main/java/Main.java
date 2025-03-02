@@ -1,7 +1,6 @@
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.NeuralNetwork;
 import NeuralNetwork.Optimizers.AdaptiveGradient;
-import NeuralNetwork.Optimizers.StochasticGradientDescentWithMomentum;
 import Utilities.Factory;
 
 public class Main {
@@ -15,8 +14,8 @@ public class Main {
         final AdaptiveGradient optimizer =
                 new AdaptiveGradient(neuralNetwork, 1.0, 0.0001, 0.0000001);
 
-        for (int i = 0; i < 25000; ++i) {
-            boolean printing = i % 100 == 0;
+        for (int i = 0; i < 10001; ++i) {
+            boolean printing = i % 1000 == 0;
 
             neuralNetwork.forward(inputBatch, targetBatch);
 

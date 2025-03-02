@@ -76,7 +76,7 @@ public class AdaptiveGradient extends OptimizerBase {
 
     private DataList getUpdatedBiasesCache(final HiddenLayer layer, final DataList biasesCache) {
         final DataList gradientWRTBiases = layer.getSavedOutputGradientStruct().getGradientWithRespectToBiases().getRow(0);
-        final DataList updatedBiasesCache = new DataList(gradientWRTBiases.getDataListRawValues());
+        final DataList updatedBiasesCache = new DataList(gradientWRTBiases.getDataListSize());
 
         for (int i = 0; i < gradientWRTBiases.getDataListSize(); ++i) {
             final double originalValue = biasesCache.getValue(i);
@@ -96,7 +96,7 @@ public class AdaptiveGradient extends OptimizerBase {
         for (int rowIndex = 0; rowIndex < gradientWRTWeights.getRowsSize(); ++rowIndex) {
             final DataList weightsCacheRow = weightsCache.getRow(rowIndex);
             final DataList gradientRow = gradientWRTWeights.getRow(rowIndex);
-            final DataList updatedWeightsRow = new DataList(gradientRow.getDataListRawValues());
+            final DataList updatedWeightsRow = new DataList(gradientRow.getDataListSize());
 
             for (int i = 0; i < gradientRow.getDataListSize(); ++i) {
                 final double originalValue = weightsCacheRow.getValue(i);

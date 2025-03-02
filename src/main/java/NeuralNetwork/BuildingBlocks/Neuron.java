@@ -30,7 +30,6 @@ public class Neuron {
         for (int i = 0; i < weightsSize; ++i) {
             this.weights.setValue(
                     i,
-                    // 25
                     Neuron.RANDOM_VALUES_SCALE * random.nextGaussian()
             );
         }
