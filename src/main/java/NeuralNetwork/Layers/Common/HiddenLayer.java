@@ -1,25 +1,28 @@
 package NeuralNetwork.Layers.Common;
 
-import NeuralNetwork.BuildingBlocks.Batch;
-import NeuralNetwork.BuildingBlocks.DataList;
-import NeuralNetwork.BuildingBlocks.Neuron;
+import NeuralNetwork.BuildingBlocks.*;
 import NeuralNetwork.Layers.LayerBase;
 import Utilities.CustomMath;
-import NeuralNetwork.BuildingBlocks.GradientStruct;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class HiddenLayer extends LayerBase {
+    private Optional<RegularizerStruct> regularizerStruct;
     private final List<Neuron> neurons;
 
     public HiddenLayer() {
         super();
+
+        this.regularizerStruct = Optional.empty();
         this.neurons = new ArrayList<>();
     }
 
     public HiddenLayer(final int weightsSize, final int neuronsSize) {
         super();
+
+        this.regularizerStruct = Optional.empty();
         this.neurons = new ArrayList<>();
 
         for (int i = 0; i < neuronsSize; ++i) {
@@ -30,6 +33,8 @@ public class HiddenLayer extends LayerBase {
 
     public HiddenLayer(final int weightsSize, final int neuronsSize, final long seed) {
         super();
+
+        this.regularizerStruct = Optional.empty();
         this.neurons = new ArrayList<>();
 
         for (int i = 0; i < neuronsSize; ++i) {
@@ -51,6 +56,27 @@ public class HiddenLayer extends LayerBase {
         this.neurons.add(neuron);
     }
 
+    public double getRegularizedLoss() {
+        if (this.regularizerStruct.isEmpty()) {
+            throw new RuntimeException("Cannot calculate regularized loss, regularized in hidden layer is not set");
+        }
+
+        double regularizedLoss = 0.0;
+
+        for (final Neuron neuron : neurons) {
+            regularizedLoss += this.regularizerStruct.get().getBiasesRegularizerL1() * Math.abs(neuron.getBias());
+            regularizedLoss += this.regularizerStruct.get().getBiasesRegularizerL2() * Math.pow(neuron.getBias(), 2.0);
+
+            final DataList weights = neuron.getWeights();
+            for (int weightIndex = 0; weightIndex < weights.getDataListSize(); ++weightIndex) {
+                regularizedLoss += this.regularizerStruct.get().getWeightsRegularizerL1() * Math.abs(weights.getValue(weightIndex));
+                regularizedLoss += this.regularizerStruct.get().getWeightsRegularizerL2() * Math.pow(weights.getValue(weightIndex), 2.0);
+            }
+        }
+
+        return regularizedLoss;
+    }
+
     public List<Neuron> getNeurons() {
         return this.neurons;
     }
@@ -65,6 +91,10 @@ public class HiddenLayer extends LayerBase {
         }
 
         return this.neurons.getFirst().getWeightsSize();
+    }
+
+    public void setRegularizerStruct(final RegularizerStruct regularizerStruct) {
+        this.regularizerStruct = Optional.of(regularizerStruct);
     }
 
     @Override
@@ -101,6 +131,11 @@ public class HiddenLayer extends LayerBase {
         final Batch gradientWRTBiases = this.calculateGradientWithRespectToBiases(inputGradientStruct);
         final Batch gradientWRTWeights = this.calculateGradientWithRespectToWeights(inputGradientStruct);
         final Batch gradientWRTInputs = this.calculateGradientWithRespectToInputs(inputGradientStruct);
+
+        if (this.regularizerStruct.isPresent()) {
+            this.regularizeGradientWithRespectToBiases(gradientWRTBiases);
+            this.regularizedGradientWithRespectToWeights(gradientWRTWeights);
+        }
 
         final GradientStruct outputGradientBatch = new GradientStruct();
         outputGradientBatch.setGradientWithRespectToBiases(gradientWRTBiases);
@@ -190,6 +225,81 @@ public class HiddenLayer extends LayerBase {
         }
 
         return outputGradient;
+    }
+
+    private void regularizeGradientWithRespectToBiases(final Batch gradientWRTBiases) {
+        assert(this.regularizerStruct.isPresent());
+        final double biasesRegularizerL1 = this.regularizerStruct.get().getBiasesRegularizerL1();
+        final double biasesRegularizerL2 = this.regularizerStruct.get().getBiasesRegularizerL2();
+
+        final DataList gradientRow = gradientWRTBiases.getRow(0);
+
+        for (int neuronIndex = 0; neuronIndex < this.neurons.size(); ++neuronIndex) {
+            final Neuron neuron = this.neurons.get(neuronIndex);
+
+            if (biasesRegularizerL1 > 0.0) {
+                final double originalGradientValue = gradientRow.getValue(neuronIndex);
+
+                if (neuron.getBias() >= 0.0) {
+                    gradientRow.setValue(
+                            neuronIndex,
+                            originalGradientValue + biasesRegularizerL1
+                    );
+                } else {
+                    gradientRow.setValue(
+                            neuronIndex,
+                            originalGradientValue + biasesRegularizerL1 * -1.0
+                    );
+                }
+            }
+
+            if (biasesRegularizerL2 > 0.0) {
+                final double originalGradientValue = gradientRow.getValue(neuronIndex);
+                final double updatedGradientValue =
+                        originalGradientValue + 2.0 * biasesRegularizerL2 * neuron.getBias();
+
+                gradientRow.setValue(neuronIndex, updatedGradientValue);
+            }
+        }
+    }
+
+    private void regularizedGradientWithRespectToWeights(final Batch gradientWRTWeights) {
+        assert(this.regularizerStruct.isPresent());
+        final double weightsRegularizerL1 = this.regularizerStruct.get().getWeightsRegularizerL1();
+        final double weightsRegularizerL2 = this.regularizerStruct.get().getWeightsRegularizerL2();
+
+        for (int gradientRowIndex = 0; gradientRowIndex < gradientWRTWeights.getRowsSize(); ++gradientRowIndex) {
+            final DataList gradientRow = gradientWRTWeights.getRow(gradientRowIndex);
+            final DataList columnWeights = this.getColumnWeights(gradientRowIndex);
+
+            if (weightsRegularizerL1 > 0.0) {
+                for (int i = 0; i < gradientRow.getDataListSize(); ++i) {
+                    final double originalGradientValue = gradientRow.getValue(i);
+
+                    if (columnWeights.getValue(i) >= 0.0) {
+                        gradientRow.setValue(
+                                i,
+                                originalGradientValue + weightsRegularizerL1
+                        );
+                    } else {
+                        gradientRow.setValue(
+                                i,
+                                originalGradientValue + weightsRegularizerL1 * -1.0
+                        );
+                    }
+                }
+            }
+
+            if (weightsRegularizerL2 > 0.0) {
+                for (int i = 0; i < gradientRow.getDataListSize(); ++i) {
+                    final double originalGradientValue = gradientRow.getValue(i);
+                    final double updatedValue =
+                            originalGradientValue + 2.0 * weightsRegularizerL2 * columnWeights.getValue(i);
+
+                    gradientRow.setValue(i, updatedValue);
+                }
+            }
+        }
     }
 
     private DataList getColumnWeights(final int columnIndex) {

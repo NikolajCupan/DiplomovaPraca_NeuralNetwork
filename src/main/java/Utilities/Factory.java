@@ -2442,19 +2442,18 @@ public class Factory {
     }
 
     public static NeuralNetwork getNeuralNetwork() {
-        final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 64);
+        final SeedGenerator seedGenerator = new SeedGenerator();
+
+        final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 64, seedGenerator.getSeed());
         final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
-        final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 3);
-        // final ActivationLayer softmax = new ActivationLayer(new Softmax());
-        // final LossLayer ccentropy = new LossLayer(new CategoricalCrossEntropy());
+        final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 3, seedGenerator.getSeed());
         final SoftmaxCategoricalCrossEntropyLayer softmaxCCE = new SoftmaxCategoricalCrossEntropyLayer();
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(2);
+        neuralNetwork.initializeRegularizer(0.0, 0.0, 0.0001, 0.0001);
         neuralNetwork.addHiddenLayer(hiddenLayer1);
         neuralNetwork.addActivationLayer(relu);
         neuralNetwork.addHiddenLayer(hiddenLayer2);
-        // neuralNetwork.addActivationLayer(softmax);
-        // neuralNetwork.addLossLayer(ccentropy);
         neuralNetwork.addSpecialLayer(softmaxCCE);
         return neuralNetwork;
     }

@@ -1,9 +1,6 @@
 package NeuralNetwork;
 
-import NeuralNetwork.BuildingBlocks.Batch;
-import NeuralNetwork.BuildingBlocks.DataList;
-import NeuralNetwork.BuildingBlocks.GradientStruct;
-import NeuralNetwork.BuildingBlocks.Neuron;
+import NeuralNetwork.BuildingBlocks.*;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
@@ -14,29 +11,16 @@ import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class NeuralNetwork {
-    private static class Regularizer {
-        private double biasesRegularizerL1;
-        private double biasesRegularizerL2;
-        private double weightsRegularizerL1;
-        private double weightsRegularizerL2;
-
-        private Regularizer() {
-            this.biasesRegularizerL1 = 0.0;
-            this.biasesRegularizerL2 = 0.0;
-            this.weightsRegularizerL1 = 0.0;
-            this.weightsRegularizerL2 = 0.0;
-        }
-    }
-
     private final int inputSize;
     private final List<LayerBase> layers;
 
     private boolean forwardStepExecuted;
     private boolean backwardStepExecuted;
 
-    private Regularizer regularizer;
+    private Optional<RegularizerStruct> regularizerStruct;
 
     public NeuralNetwork(final int inputSize) {
         this.inputSize = inputSize;
@@ -45,18 +29,29 @@ public class NeuralNetwork {
         this.forwardStepExecuted = false;
         this.backwardStepExecuted = false;
 
-        this.regularizer = new Regularizer();
+        this.regularizerStruct = Optional.empty();
     }
 
-    public void setRegularizerParameters(
+    public void initializeRegularizer(
             final double biasesRegularizerL1,
             final double biasesRegularizerL2,
             final double weightsRegularizerL1,
             final double weightsRegularizerL2) {
-        this.regularizer.biasesRegularizerL1 = biasesRegularizerL1;
-        this.regularizer.biasesRegularizerL2 = biasesRegularizerL2;
-        this.regularizer.weightsRegularizerL1 = weightsRegularizerL1;
-        this.regularizer.weightsRegularizerL2 = weightsRegularizerL2;
+        if (this.regularizerStruct.isPresent()) {
+            throw new RuntimeException("Regularizer is already set in neural network");
+        }
+
+        if (!this.layers.isEmpty()) {
+            throw new RuntimeException("Regularizer cannot be set if layers are not empty");
+        }
+
+        final RegularizerStruct regularizer = new RegularizerStruct();
+        regularizer.setBiasesRegularizerL1(biasesRegularizerL1);
+        regularizer.setBiasesRegularizerL2(biasesRegularizerL2);
+        regularizer.setWeightsRegularizerL1(weightsRegularizerL1);
+        regularizer.setWeightsRegularizerL2(weightsRegularizerL2);
+
+        this.regularizerStruct = Optional.of(regularizer);
     }
 
     public double getAccuracy() {
@@ -92,20 +87,7 @@ public class NeuralNetwork {
 
         for (final LayerBase layer : this.layers) {
             if (layer instanceof final HiddenLayer hiddenLayer) {
-                final List<Neuron> neurons = hiddenLayer.getNeurons();
-
-                for (int neuronIndex = 0; neuronIndex < neurons.size(); ++neuronIndex){
-                    final Neuron neuron = neurons.get(neuronIndex);
-
-                    regularizedLoss += this.regularizer.biasesRegularizerL1 * Math.abs(neuron.getBias());
-                    regularizedLoss += this.regularizer.biasesRegularizerL2 * Math.pow(neuron.getBias(), 2.0);
-
-                    final DataList weights = neuron.getWeights();
-                    for (int weightIndex = 0; weightIndex < weights.getDataListSize(); ++weightIndex) {
-                        regularizedLoss += this.regularizer.weightsRegularizerL1 * Math.abs(weights.getValue(weightIndex));
-                        regularizedLoss += this.regularizer.weightsRegularizerL2 * Math.pow(weights.getValue(weightIndex), 2.0);
-                    }
-                }
+                regularizedLoss += hiddenLayer.getRegularizedLoss();
             }
         }
 
@@ -195,6 +177,10 @@ public class NeuralNetwork {
                         "Last hidden layer neurons size [" + penultimateLayerNeuronsSize + "] is not equal to new hidden layer weights size [" + hiddenLayerToBeAddedWeightsSize + "]"
                 );
             }
+        }
+
+        if (this.regularizerStruct.isPresent()) {
+            hiddenLayerToBeAdded.setRegularizerStruct(this.regularizerStruct.get());
         }
 
         this.layers.add(hiddenLayerToBeAdded);

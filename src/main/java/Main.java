@@ -13,12 +13,11 @@ public class Main {
         final Batch targetBatch = Factory.getTargetBatch();
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
-        neuralNetwork.setRegularizerParameters(0.1, 0.1, 0.1, 0.1);
         final OptimizerBase optimizer =
                 new AdaptiveMomentum(neuralNetwork, 0.05, 0.00001, 0.0000005, 0.9, 0.999);
 
-        for (int i = 0; i < 50001; ++i) {
-            boolean printing = i % 500 == 0;
+        for (int i = 0; i < 1001; ++i) {
+            boolean printing = i % 100 == 0;
 
             neuralNetwork.forward(inputBatch, targetBatch);
 
