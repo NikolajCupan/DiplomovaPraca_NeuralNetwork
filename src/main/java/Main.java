@@ -1,6 +1,6 @@
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.NeuralNetwork;
-import NeuralNetwork.Optimizers.AdaptiveGradient;
+import NeuralNetwork.Optimizers.RootMeanSquarePropagation;
 import Utilities.Factory;
 
 public class Main {
@@ -11,8 +11,8 @@ public class Main {
         final Batch targetBatch = Factory.getTargetBatch();
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
-        final AdaptiveGradient optimizer =
-                new AdaptiveGradient(neuralNetwork, 1.0, 0.0001, 0.0000001);
+        final RootMeanSquarePropagation optimizer =
+                new RootMeanSquarePropagation(neuralNetwork, 0.02, 0.00001, 0.0000001, 0.999);
 
         for (int i = 0; i < 10001; ++i) {
             boolean printing = i % 1000 == 0;

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdaptiveGradient extends OptimizerBase {
+public class RootMeanSquarePropagation extends OptimizerBase {
     private static class Cache {
         private DataList biasesCache;
         private Batch weightsCache;
@@ -23,17 +23,20 @@ public class AdaptiveGradient extends OptimizerBase {
     }
 
     private final double epsilon;
+    private final double rho;
     private final Map<Long, Cache> cachesMap;
 
-    public AdaptiveGradient(
+    public RootMeanSquarePropagation(
             final NeuralNetwork neuralNetwork,
             final double startingLearningRate,
             final double learningRateDecay,
-            final double epsilon
+            final double epsilon,
+            final double rho
     ) {
         super(neuralNetwork, startingLearningRate, learningRateDecay);
 
         this.epsilon = epsilon;
+        this.rho = rho;
         this.cachesMap = new HashMap<>();
 
         for (final LayerBase layer : neuralNetwork.getLayers()) {
@@ -81,7 +84,7 @@ public class AdaptiveGradient extends OptimizerBase {
         for (int i = 0; i < gradientWRTBiases.getDataListSize(); ++i) {
             final double originalCacheValue = biasesCache.getValue(i);
             final double updatedValue =
-                    originalCacheValue + Math.pow(gradientWRTBiases.getValue(i), 2.0);
+                    this.rho * originalCacheValue + (1 - this.rho) * Math.pow(gradientWRTBiases.getValue(i), 2.0);
 
             updatedBiasesCache.setValue(i, updatedValue);
         }
@@ -101,7 +104,7 @@ public class AdaptiveGradient extends OptimizerBase {
             for (int i = 0; i < gradientRow.getDataListSize(); ++i) {
                 final double originalCacheValue = weightsCacheRow.getValue(i);
                 final double updatedValue =
-                        originalCacheValue + Math.pow(gradientRow.getValue(i), 2.0);
+                        this.rho * originalCacheValue + (1 - this.rho) * Math.pow(gradientRow.getValue(i), 2.0);
 
                 updatedWeightsRow.setValue(i, updatedValue);
             }
