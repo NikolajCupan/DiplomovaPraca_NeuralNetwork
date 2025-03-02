@@ -40,5 +40,9 @@ public abstract class OptimizerBase {
         return this.startingLearningRate * (1.0 / (1.0 + this.learningRateDecay * this.currentIteration));
     }
 
+    public int getCurrentIteration() {
+        return this.currentIteration;
+    }
+
     protected abstract void optimize();
 }

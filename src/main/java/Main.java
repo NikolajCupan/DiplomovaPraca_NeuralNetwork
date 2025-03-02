@@ -1,6 +1,7 @@
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.NeuralNetwork;
-import NeuralNetwork.Optimizers.RootMeanSquarePropagation;
+import NeuralNetwork.Optimizers.AdaptiveMomentum;
+import NeuralNetwork.Optimizers.OptimizerBase;
 import Utilities.Factory;
 
 public class Main {
@@ -11,11 +12,11 @@ public class Main {
         final Batch targetBatch = Factory.getTargetBatch();
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
-        final RootMeanSquarePropagation optimizer =
-                new RootMeanSquarePropagation(neuralNetwork, 0.02, 0.00001, 0.0000001, 0.999);
+        final OptimizerBase optimizer =
+                new AdaptiveMomentum(neuralNetwork, 0.02, 0.00001, 0.0000001, 0.9, 0.999);
 
         for (int i = 0; i < 10001; ++i) {
-            boolean printing = i % 1000 == 0;
+            boolean printing = i % 500 == 0;
 
             neuralNetwork.forward(inputBatch, targetBatch);
 
