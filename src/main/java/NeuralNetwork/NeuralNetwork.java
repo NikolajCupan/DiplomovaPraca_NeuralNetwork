@@ -1,7 +1,9 @@
 package NeuralNetwork;
 
 import NeuralNetwork.BuildingBlocks.Batch;
+import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
+import NeuralNetwork.BuildingBlocks.Neuron;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
@@ -14,11 +16,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NeuralNetwork {
+    private static class Regularizer {
+        private double biasesRegularizerL1;
+        private double biasesRegularizerL2;
+        private double weightsRegularizerL1;
+        private double weightsRegularizerL2;
+
+        private Regularizer() {
+            this.biasesRegularizerL1 = 0.0;
+            this.biasesRegularizerL2 = 0.0;
+            this.weightsRegularizerL1 = 0.0;
+            this.weightsRegularizerL2 = 0.0;
+        }
+    }
+
     private final int inputSize;
     private final List<LayerBase> layers;
 
     private boolean forwardStepExecuted;
     private boolean backwardStepExecuted;
+
+    private Regularizer regularizer;
 
     public NeuralNetwork(final int inputSize) {
         this.inputSize = inputSize;
@@ -26,6 +44,19 @@ public class NeuralNetwork {
 
         this.forwardStepExecuted = false;
         this.backwardStepExecuted = false;
+
+        this.regularizer = new Regularizer();
+    }
+
+    public void setRegularizerParameters(
+            final double biasesRegularizerL1,
+            final double biasesRegularizerL2,
+            final double weightsRegularizerL1,
+            final double weightsRegularizerL2) {
+        this.regularizer.biasesRegularizerL1 = biasesRegularizerL1;
+        this.regularizer.biasesRegularizerL2 = biasesRegularizerL2;
+        this.regularizer.weightsRegularizerL1 = weightsRegularizerL1;
+        this.regularizer.weightsRegularizerL2 = weightsRegularizerL2;
     }
 
     public double getAccuracy() {
@@ -54,6 +85,31 @@ public class NeuralNetwork {
         } else {
             throw new RuntimeException("Last layer cannot be used to calculate loss");
         }
+    }
+
+    public double getRegularizedLoss() {
+        double regularizedLoss = this.getLoss();
+
+        for (final LayerBase layer : this.layers) {
+            if (layer instanceof final HiddenLayer hiddenLayer) {
+                final List<Neuron> neurons = hiddenLayer.getNeurons();
+
+                for (int neuronIndex = 0; neuronIndex < neurons.size(); ++neuronIndex){
+                    final Neuron neuron = neurons.get(neuronIndex);
+
+                    regularizedLoss += this.regularizer.biasesRegularizerL1 * Math.abs(neuron.getBias());
+                    regularizedLoss += this.regularizer.biasesRegularizerL2 * Math.pow(neuron.getBias(), 2.0);
+
+                    final DataList weights = neuron.getWeights();
+                    for (int weightIndex = 0; weightIndex < weights.getDataListSize(); ++weightIndex) {
+                        regularizedLoss += this.regularizer.weightsRegularizerL1 * Math.abs(weights.getValue(weightIndex));
+                        regularizedLoss += this.regularizer.weightsRegularizerL2 * Math.pow(weights.getValue(weightIndex), 2.0);
+                    }
+                }
+            }
+        }
+
+        return regularizedLoss;
     }
 
     public boolean isBackwardStepExecuted() {

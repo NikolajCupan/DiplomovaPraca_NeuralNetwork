@@ -22,7 +22,12 @@ public class Helper {
         return builder.toString();
     }
 
-    private static String formatNumber(final double value) {
-        return String.format("%." + Helper.DECIMAL_POINTS_PRINTED + "f", value);
+    public static String formatNumber(final double value) {
+        return Helper.formatNumber(value, Helper.DECIMAL_POINTS_PRINTED);
+    }
+
+    public static String formatNumber(final double value, final int decimalPointsCount) {
+        final String format = "%." + decimalPointsCount + "f";
+        return String.format(format, value);
     }
 }
