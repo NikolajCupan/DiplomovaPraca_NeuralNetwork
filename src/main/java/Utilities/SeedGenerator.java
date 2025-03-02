@@ -5,6 +5,10 @@ import java.util.Random;
 public class SeedGenerator {
     private final Random random;
 
+    public SeedGenerator() {
+        this.random = new Random();
+    }
+
     public SeedGenerator(final long seed) {
         this.random = new Random(seed);
     }

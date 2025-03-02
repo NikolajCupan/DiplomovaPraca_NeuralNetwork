@@ -76,7 +76,7 @@ public class StochasticGradientDescentWithMomentum extends OptimizerBase {
         final double currentLearningRate = this.getCurrentLearningRate();
 
         final DataList gradientWRTBiases = layer.getSavedOutputGradientStruct().getGradientWithRespectToBiases().getRow(0);
-        final DataList updatedBiasesMomentum = new DataList(biasesMomentum.getDataListRawValues());
+        final DataList updatedBiasesMomentum = new DataList(biasesMomentum.getDataListSize());
 
         for (int i = 0; i < biasesMomentum.getDataListSize(); ++i) {
             final double updatedValue =
