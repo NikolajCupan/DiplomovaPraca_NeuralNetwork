@@ -14,12 +14,12 @@ public class Main {
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
         final OptimizerBase optimizer =
-                new AdaptiveMomentum(neuralNetwork, 0.02, 0.0000005, 0.0000001, 0.9, 0.999);
+                new AdaptiveMomentum(neuralNetwork, 0.05, 0.00005, 0.0000001, 0.9, 0.999);
 
         for (int i = 0; i < 2_501; ++i) {
             boolean printing = i % 500 == 0;
 
-            neuralNetwork.forward(inputBatch, targetBatch);
+            neuralNetwork.forward(inputBatch, targetBatch, false);
 
             if (printing) {
                 final double accuracy = neuralNetwork.getAccuracy();
@@ -51,7 +51,7 @@ public class Main {
         final Batch testInputBatch = Factory.getTestingInputBatch();
         final Batch testTargetBatch = Factory.getTestingTargetBatch();
 
-        neuralNetwork.forward(testInputBatch, testTargetBatch);
+        neuralNetwork.forward(testInputBatch, testTargetBatch, true);
 
         final double accuracy = neuralNetwork.getAccuracy();
         final double loss = neuralNetwork.getLoss();

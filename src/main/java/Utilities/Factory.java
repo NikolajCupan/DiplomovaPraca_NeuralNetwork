@@ -5,6 +5,7 @@ import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.BuildingBlocks.RegularizerStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
+import NeuralNetwork.Layers.Common.DropoutLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
 import NeuralNetwork.NeuralNetwork;
@@ -2442,20 +2443,17 @@ public class Factory {
         final SeedGenerator seedGenerator = new SeedGenerator();
 
         final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 64, seedGenerator.getSeed());
-        // hiddenLayer1.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
-
+        hiddenLayer1.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
         final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
-
+        final DropoutLayer dropoutLayer1 = new DropoutLayer(0.999, seedGenerator.getSeed());
         final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 3, seedGenerator.getSeed());
-        // hiddenLayer2.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
-
         final SoftmaxCategoricalCrossEntropyLayer softmaxCCE = new SoftmaxCategoricalCrossEntropyLayer();
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(2);
-        // neuralNetwork.initializeGlobalRegularizer(0.0, 0.0005, 0.0, 0.0005);
 
         neuralNetwork.addHiddenLayer(hiddenLayer1);
         neuralNetwork.addActivationLayer(relu);
+        neuralNetwork.addDropoutLayer(dropoutLayer1);
         neuralNetwork.addHiddenLayer(hiddenLayer2);
         neuralNetwork.addSpecialLayer(softmaxCCE);
         return neuralNetwork;

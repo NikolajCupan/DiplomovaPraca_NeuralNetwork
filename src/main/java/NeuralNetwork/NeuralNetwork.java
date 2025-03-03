@@ -2,6 +2,7 @@ package NeuralNetwork;
 
 import NeuralNetwork.BuildingBlocks.*;
 import NeuralNetwork.Layers.Common.ActivationLayer;
+import NeuralNetwork.Layers.Common.DropoutLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
 import NeuralNetwork.Layers.IAccuracyLayerBase;
@@ -102,20 +103,27 @@ public class NeuralNetwork {
         return this.layers;
     }
 
-    public void forward(final Batch inputBatch, final Batch targetBatch) {
+    public void forward(final Batch inputBatch, final Batch targetBatch, final boolean excludeDropoutLayers) {
         if (!this.isLastLayerSuitable()) {
             throw new RuntimeException("Cannot perform forward method, last layer is not suitable");
         }
 
-        final LayerBase lastLayer = this.layers.getLast();
+        final List<LayerBase> usedLayers = new ArrayList<>();
+        for (final LayerBase layer : this.layers) {
+            if (!excludeDropoutLayers || !(layer instanceof DropoutLayer)) {
+                usedLayers.add(layer);
+            }
+        }
+
+        final LayerBase lastLayer = usedLayers.getLast();
         lastLayer.setSavedTargetBatch(targetBatch);
 
-        final HiddenLayer firstLayer = this.getLayerAsType(0, HiddenLayer.class);
+        final HiddenLayer firstLayer = NeuralNetwork.getLayerAsType(usedLayers, 0, HiddenLayer.class);
         firstLayer.forward(inputBatch);
 
-        for (int i = 1; i < this.layers.size(); ++i) {
-            final LayerBase previousLayer = this.layers.get(i - 1);
-            final LayerBase currentLayer = this.layers.get(i);
+        for (int i = 1; i < usedLayers.size(); ++i) {
+            final LayerBase previousLayer = usedLayers.get(i - 1);
+            final LayerBase currentLayer = usedLayers.get(i);
 
             currentLayer.forward(previousLayer.getSavedOutputBatch());
         }
@@ -168,14 +176,17 @@ public class NeuralNetwork {
             }
             assert(this.layers.size() >= 2);
 
-            final HiddenLayer penultimateLayer = this.getLayerAsType(this.layers.size() - 2, HiddenLayer.class);
-            final int penultimateLayerNeuronsSize = penultimateLayer.getNeuronsSize();
-            final int hiddenLayerToBeAddedWeightsSize = hiddenLayerToBeAdded.getWeightsSize();
+            final LayerBase penultimateLayer = this.layers.get(this.layers.size() - 2);
 
-            if (penultimateLayerNeuronsSize != hiddenLayerToBeAddedWeightsSize) {
-                throw new IllegalArgumentException(
-                        "Current last hidden layer neurons size [" + penultimateLayerNeuronsSize + "] is not equal to new hidden layer weights size [" + hiddenLayerToBeAddedWeightsSize + "]"
-                );
+            if (penultimateLayer instanceof final HiddenLayer penultimateHiddenLayer) {
+                final int penultimateLayerNeuronsSize = penultimateHiddenLayer.getNeuronsSize();
+                final int hiddenLayerToBeAddedWeightsSize = hiddenLayerToBeAdded.getWeightsSize();
+
+                if (penultimateLayerNeuronsSize != hiddenLayerToBeAddedWeightsSize) {
+                    throw new IllegalArgumentException(
+                            "Current last hidden layer neurons size [" + penultimateLayerNeuronsSize + "] is not equal to new hidden layer weights size [" + hiddenLayerToBeAddedWeightsSize + "]"
+                    );
+                }
             }
         }
 
@@ -201,6 +212,19 @@ public class NeuralNetwork {
         }
 
         this.layers.add(activationLayerToBeAdded);
+    }
+
+    public void addDropoutLayer(final DropoutLayer dropoutLayerToBeAdded) {
+        if (this.layers.isEmpty()) {
+            throw new IllegalArgumentException("Dropout layer cannot be the first layer in neural network");
+        }
+
+        final LayerBase lastLayer = this.layers.getLast();
+        if (!dropoutLayerToBeAdded.isCompatible(lastLayer)) {
+            throw new IllegalArgumentException("Dropout layer cannot be placed after " + lastLayer.getClass());
+        }
+
+        this.layers.add(dropoutLayerToBeAdded);
     }
 
     public void addLossLayer(final LossLayer lossLayerToBeAdded) {
@@ -233,8 +257,8 @@ public class NeuralNetwork {
         }
     }
 
-    private <T extends LayerBase> T getLayerAsType(final int index, final Class<T> type) {
-        final LayerBase layer = this.layers.get(index);
+    private static <T extends LayerBase> T getLayerAsType(final List<LayerBase> layers, final int index, final Class<T> type) {
+        final LayerBase layer = layers.get(index);
 
         if (type.isInstance(layer)) {
             return type.cast(layer);
