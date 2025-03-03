@@ -20,7 +20,7 @@ public class NeuralNetwork {
     private boolean forwardStepExecuted;
     private boolean backwardStepExecuted;
 
-    private Optional<RegularizerStruct> regularizerStruct;
+    private Optional<RegularizerStruct> globalRegularizerStruct;
 
     public NeuralNetwork(final int inputSize) {
         this.inputSize = inputSize;
@@ -29,20 +29,20 @@ public class NeuralNetwork {
         this.forwardStepExecuted = false;
         this.backwardStepExecuted = false;
 
-        this.regularizerStruct = Optional.empty();
+        this.globalRegularizerStruct = Optional.empty();
     }
 
-    public void initializeRegularizer(
+    public void initializeGlobalRegularizer(
             final double biasesRegularizerL1,
             final double biasesRegularizerL2,
             final double weightsRegularizerL1,
             final double weightsRegularizerL2) {
-        if (this.regularizerStruct.isPresent()) {
-            throw new RuntimeException("Regularizer is already set in neural network");
+        if (this.globalRegularizerStruct.isPresent()) {
+            throw new RuntimeException("Global regularizer is already set in neural network");
         }
 
         if (!this.layers.isEmpty()) {
-            throw new RuntimeException("Regularizer cannot be set if layers are not empty");
+            throw new RuntimeException("Global regularizer cannot be set if layers are not empty");
         }
 
         final RegularizerStruct regularizer = new RegularizerStruct();
@@ -51,7 +51,7 @@ public class NeuralNetwork {
         regularizer.setWeightsRegularizerL1(weightsRegularizerL1);
         regularizer.setWeightsRegularizerL2(weightsRegularizerL2);
 
-        this.regularizerStruct = Optional.of(regularizer);
+        this.globalRegularizerStruct = Optional.of(regularizer);
     }
 
     public double getAccuracy() {
@@ -86,7 +86,7 @@ public class NeuralNetwork {
         double regularizedLoss = this.getLoss();
 
         for (final LayerBase layer : this.layers) {
-            if (layer instanceof final HiddenLayer hiddenLayer) {
+            if (layer instanceof final HiddenLayer hiddenLayer && hiddenLayer.isRegularizerPresent()) {
                 regularizedLoss += hiddenLayer.getRegularizedLoss();
             }
         }
@@ -179,8 +179,12 @@ public class NeuralNetwork {
             }
         }
 
-        if (this.regularizerStruct.isPresent()) {
-            hiddenLayerToBeAdded.setRegularizerStruct(this.regularizerStruct.get());
+        if (this.globalRegularizerStruct.isPresent()) {
+            try {
+                hiddenLayerToBeAdded.initializeRegularizer(this.globalRegularizerStruct.get());
+            } catch (final Exception IllegalArgumentException) {
+                throw new IllegalArgumentException("Neural network could not set regularizer for hidden layer, hidden layer already has regularizer set");
+            }
         }
 
         this.layers.add(hiddenLayerToBeAdded);

@@ -3,6 +3,7 @@ package Utilities;
 import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
+import NeuralNetwork.BuildingBlocks.RegularizerStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
@@ -2441,12 +2442,15 @@ public class Factory {
         final SeedGenerator seedGenerator = new SeedGenerator();
 
         final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 512, seedGenerator.getSeed());
+        hiddenLayer1.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
+
         final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
         final HiddenLayer hiddenLayer2 = new HiddenLayer(512, 3, seedGenerator.getSeed());
         final SoftmaxCategoricalCrossEntropyLayer softmaxCCE = new SoftmaxCategoricalCrossEntropyLayer();
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(2);
-        neuralNetwork.initializeRegularizer(0.0, 0.0005, 0.0, 0.0005);
+        // neuralNetwork.initializeGlobalRegularizer(0.0, 0.0005, 0.0, 0.0005);
+
         neuralNetwork.addHiddenLayer(hiddenLayer1);
         neuralNetwork.addActivationLayer(relu);
         neuralNetwork.addHiddenLayer(hiddenLayer2);

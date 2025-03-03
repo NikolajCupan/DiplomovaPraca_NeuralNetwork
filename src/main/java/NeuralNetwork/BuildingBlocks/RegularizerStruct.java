@@ -13,6 +13,18 @@ public class RegularizerStruct {
         this.weightsRegularizerL2 = 0.0;
     }
 
+    public RegularizerStruct(
+            final double biasesRegularizerL1,
+            final double biasesRegularizerL2,
+            final double weightsRegularizerL1,
+            final double weightsRegularizerL2
+    ) {
+        this.biasesRegularizerL1 = biasesRegularizerL1;
+        this.biasesRegularizerL2 = biasesRegularizerL2;
+        this.weightsRegularizerL1 = weightsRegularizerL1;
+        this.weightsRegularizerL2 = weightsRegularizerL2;
+    }
+
     public double getBiasesRegularizerL1() {
         return this.biasesRegularizerL1;
     }

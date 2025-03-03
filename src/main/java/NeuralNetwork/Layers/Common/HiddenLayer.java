@@ -77,6 +77,10 @@ public class HiddenLayer extends LayerBase {
         return regularizedLoss;
     }
 
+    public boolean isRegularizerPresent() {
+        return this.regularizerStruct.isPresent();
+    }
+
     public List<Neuron> getNeurons() {
         return this.neurons;
     }
@@ -93,7 +97,11 @@ public class HiddenLayer extends LayerBase {
         return this.neurons.getFirst().getWeightsSize();
     }
 
-    public void setRegularizerStruct(final RegularizerStruct regularizerStruct) {
+    public void initializeRegularizer(final RegularizerStruct regularizerStruct) {
+        if (this.regularizerStruct.isPresent()) {
+            throw new IllegalArgumentException("Hidden layer already has regularizer set");
+        }
+
         this.regularizerStruct = Optional.of(regularizerStruct);
     }
 
