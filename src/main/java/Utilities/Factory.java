@@ -2441,11 +2441,14 @@ public class Factory {
     public static NeuralNetwork getNeuralNetwork() {
         final SeedGenerator seedGenerator = new SeedGenerator();
 
-        final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 512, seedGenerator.getSeed());
-        hiddenLayer1.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
+        final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 64, seedGenerator.getSeed());
+        // hiddenLayer1.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
 
         final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
-        final HiddenLayer hiddenLayer2 = new HiddenLayer(512, 3, seedGenerator.getSeed());
+
+        final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 3, seedGenerator.getSeed());
+        // hiddenLayer2.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
+
         final SoftmaxCategoricalCrossEntropyLayer softmaxCCE = new SoftmaxCategoricalCrossEntropyLayer();
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(2);

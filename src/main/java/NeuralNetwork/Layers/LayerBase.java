@@ -114,4 +114,7 @@ public abstract class LayerBase {
 
     public abstract void forward(final Batch inputBatch);
     public abstract void backward(final GradientStruct inputGradientStruct);
+
+    // Method check if "this" layer can be placed after "previousLayer" in neural network
+    public abstract boolean isCompatible(final LayerBase previousLayer);
 }

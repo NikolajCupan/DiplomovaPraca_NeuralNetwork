@@ -85,6 +85,11 @@ public class ActivationLayer extends LayerBase {
     }
 
     @Override
+    public boolean isCompatible(final LayerBase previousLayer) {
+        return previousLayer instanceof HiddenLayer;
+    }
+
+    @Override
     public String toString() {
         return "{\n\tActivation layer: activation function [" +
                 this.activationFunction +

@@ -95,6 +95,11 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
     }
 
     @Override
+    public boolean isCompatible(final LayerBase previousLayer) {
+        return previousLayer instanceof ActivationLayer;
+    }
+
+    @Override
     public String toString() {
         return "{\n\tLoss layer: loss function [" +
                 this.lossFunction +

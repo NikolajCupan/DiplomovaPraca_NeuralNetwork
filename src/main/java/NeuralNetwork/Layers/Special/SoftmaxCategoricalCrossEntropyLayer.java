@@ -5,6 +5,7 @@ import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
+import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
 import NeuralNetwork.Layers.IAccuracyLayerBase;
 import NeuralNetwork.Layers.ILossLayerBase;
@@ -91,6 +92,11 @@ public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase implements IA
         final GradientStruct gradientStruct = new GradientStruct();
         gradientStruct.setGradientWithRespectToInputs(gradientWRTInputs);
         this.setSavedOutputGradientStruct(gradientStruct);
+    }
+
+    @Override
+    public boolean isCompatible(final LayerBase previousLayer) {
+        return previousLayer instanceof HiddenLayer;
     }
 
     @Override

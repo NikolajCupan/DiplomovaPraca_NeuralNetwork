@@ -163,8 +163,8 @@ public class NeuralNetwork {
             }
         } else {
             final LayerBase lastLayer = this.layers.getLast();
-            if (!(lastLayer instanceof ActivationLayer)) {
-                throw new IllegalArgumentException("Layer before hidden layer must be activation layer");
+            if (!hiddenLayerToBeAdded.isCompatible(lastLayer)) {
+                throw new IllegalArgumentException("Hidden layer cannot be placed after " + lastLayer.getClass());
             }
             assert(this.layers.size() >= 2);
 
@@ -196,8 +196,8 @@ public class NeuralNetwork {
         }
 
         final LayerBase lastLayer = this.layers.getLast();
-        if (!(lastLayer instanceof HiddenLayer)) {
-            throw new IllegalArgumentException("Layer before activation layer must be hidden layer");
+        if (!activationLayerToBeAdded.isCompatible(lastLayer)) {
+            throw new IllegalArgumentException("Activation layer cannot be placed after " + lastLayer.getClass());
         }
 
         this.layers.add(activationLayerToBeAdded);
@@ -209,8 +209,8 @@ public class NeuralNetwork {
         }
 
         final LayerBase lastLayer = this.layers.getLast();
-        if (!(lastLayer instanceof ActivationLayer)) {
-            throw new IllegalArgumentException("Layer before loss layer must be activation layer");
+        if (!lossLayerToBeAdded.isCompatible(lastLayer)) {
+            throw new IllegalArgumentException("Loss layer cannot be placed after "  + lastLayer.getClass());
         }
 
         this.layers.add(lossLayerToBeAdded);
@@ -223,8 +223,8 @@ public class NeuralNetwork {
             }
 
             final LayerBase lastLayer = this.layers.getLast();
-            if (!(lastLayer instanceof HiddenLayer)) {
-                throw new IllegalArgumentException("Layer before softmax categorical cross entropy layer must be hidden layer");
+            if (!softmaxCCELayer.isCompatible(lastLayer)) {
+                throw new IllegalArgumentException("Softmax categorical cross entropy layer cannot be placed after " + lastLayer.getClass());
             }
 
             this.layers.add(specialLayerToBeAdded);

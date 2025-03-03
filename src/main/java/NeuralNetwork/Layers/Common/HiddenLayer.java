@@ -331,6 +331,12 @@ public class HiddenLayer extends LayerBase {
     }
 
     @Override
+    public boolean isCompatible(final LayerBase previousLayer) {
+        return previousLayer instanceof ActivationLayer ||
+               previousLayer instanceof DropoutLayer;
+    }
+
+    @Override
     public String toString() {
         if (this.neurons.isEmpty()) {
             return "{ Layer: empty }";
