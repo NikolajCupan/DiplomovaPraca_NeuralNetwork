@@ -9,7 +9,6 @@ import NeuralNetwork.LossFunctions.BinaryCrossEntropy;
 import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import NeuralNetwork.LossFunctions.ILossFunction;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
-import Utilities.CustomMath;
 
 public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLayerBase  {
     private final ILossFunction lossFunction;
@@ -21,32 +20,29 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
 
     @Override
     public double getAccuracy() {
-        final Batch predictedBatch = this.getSavedInputBatch();
-        final Batch targetBatch = this.getSavedTargetBatch();
-        assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
-
-        final int rowsSize = predictedBatch.getRowsSize();
-        int correctPredictionsSize = 0;
-
-        for (int rowIndex = 0; rowIndex < rowsSize; ++rowIndex) {
-            final DataList predictedRow = predictedBatch.getRow(rowIndex);
-            final DataList targetRow = targetBatch.getRow(rowIndex);
-
-            final int predictedRowArgMax = CustomMath.argMax(predictedRow);
-            final int targetRowArgMax = CustomMath.argMax(targetRow);
-
-            if (predictedRowArgMax == targetRowArgMax) {
-                ++correctPredictionsSize;
-            }
+        if (this.lossFunction instanceof final CategoricalCrossEntropy categoricalCrossEntropy) {
+            return categoricalCrossEntropy.getAccuracy(
+                    this.getSavedInputBatch(),
+                    this.getSavedTargetBatch()
+            );
+        } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
+            return binaryCrossEntropy.getAccuracy();
+        } else {
+            throw new RuntimeException("Loss layer cannot be used to calculate accuracy");
         }
-
-        return (double)correctPredictionsSize / rowsSize;
     }
 
     @Override
     public double getLoss() {
-        final DataList savedOutput = this.getSavedOutputBatch().getRow(0);
-        return CustomMath.mean(savedOutput);
+        if (this.lossFunction instanceof final CategoricalCrossEntropy categoricalCrossEntropy) {
+            return categoricalCrossEntropy.getLoss(
+                   this.getSavedOutputBatch()
+            );
+        } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
+            return binaryCrossEntropy.getLoss();
+        } else {
+            throw new RuntimeException("Loss layer cannot be used to calculate loss");
+        }
     }
 
     @Override

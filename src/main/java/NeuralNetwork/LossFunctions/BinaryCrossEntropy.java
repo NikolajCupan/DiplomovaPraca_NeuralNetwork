@@ -36,6 +36,14 @@ public class BinaryCrossEntropy implements ILossFunction {
         return gradientWRTInputs;
     }
 
+    public double getAccuracy() {
+        return 0.0;
+    }
+
+    public double getLoss() {
+        return 0.0;
+    }
+
     @Override
     public double loss(final DataList predictedRow, final DataList targetRow) {
         if (predictedRow.getDataListSize() != targetRow.getDataListSize()) {
