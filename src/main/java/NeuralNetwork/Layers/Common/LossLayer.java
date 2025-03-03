@@ -26,7 +26,10 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
                     this.getSavedTargetBatch()
             );
         } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
-            return binaryCrossEntropy.getAccuracy();
+            return binaryCrossEntropy.getAccuracy(
+                    this.getSavedInputBatch(),
+                    this.getSavedTargetBatch()
+            );
         } else {
             throw new RuntimeException("Loss layer cannot be used to calculate accuracy");
         }
@@ -39,7 +42,9 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
                    this.getSavedOutputBatch()
             );
         } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
-            return binaryCrossEntropy.getLoss();
+            return binaryCrossEntropy.getLoss(
+                    this.getSavedOutputBatch()
+            );
         } else {
             throw new RuntimeException("Loss layer cannot be used to calculate loss");
         }
