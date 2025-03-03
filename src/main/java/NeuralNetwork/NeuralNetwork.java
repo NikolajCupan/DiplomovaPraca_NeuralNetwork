@@ -103,14 +103,14 @@ public class NeuralNetwork {
         return this.layers;
     }
 
-    public void forward(final Batch inputBatch, final Batch targetBatch, final boolean excludeDropoutLayers) {
+    public void forward(final Batch inputBatch, final Batch targetBatch, final boolean includeDropoutLayers) {
         if (!this.isLastLayerSuitable()) {
             throw new RuntimeException("Cannot perform forward method, last layer is not suitable");
         }
 
         final List<LayerBase> usedLayers = new ArrayList<>();
         for (final LayerBase layer : this.layers) {
-            if (!excludeDropoutLayers || !(layer instanceof DropoutLayer)) {
+            if (includeDropoutLayers || !(layer instanceof DropoutLayer)) {
                 usedLayers.add(layer);
             }
         }
