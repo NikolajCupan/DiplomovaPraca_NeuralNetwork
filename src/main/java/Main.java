@@ -14,10 +14,10 @@ public class Main {
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
         final OptimizerBase optimizer =
-                new AdaptiveMomentum(neuralNetwork, 0.05, 0.00001, 0.0000005, 0.9, 0.999);
+                new AdaptiveMomentum(neuralNetwork, 0.02, 0.0000005, 0.0000001, 0.9, 0.999);
 
-        for (int i = 0; i < 1001; ++i) {
-            boolean printing = i % 100 == 0;
+        for (int i = 0; i < 2_501; ++i) {
+            boolean printing = i % 500 == 0;
 
             neuralNetwork.forward(inputBatch, targetBatch);
 
@@ -48,10 +48,10 @@ public class Main {
         System.out.println("Time needed: " + (endTime - startTime) + " ms");
 
 
-        final Batch trainInputBatch = Factory.getTestingInputBatch();
-        final Batch trainTargetBatch = Factory.getTestingTargetBatch();
+        final Batch testInputBatch = Factory.getTestingInputBatch();
+        final Batch testTargetBatch = Factory.getTestingTargetBatch();
 
-        neuralNetwork.forward(trainInputBatch, trainTargetBatch);
+        neuralNetwork.forward(testInputBatch, testTargetBatch);
 
         final double accuracy = neuralNetwork.getAccuracy();
         final double loss = neuralNetwork.getLoss();

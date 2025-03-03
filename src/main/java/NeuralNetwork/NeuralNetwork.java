@@ -174,7 +174,7 @@ public class NeuralNetwork {
 
             if (penultimateLayerNeuronsSize != hiddenLayerToBeAddedWeightsSize) {
                 throw new IllegalArgumentException(
-                        "Last hidden layer neurons size [" + penultimateLayerNeuronsSize + "] is not equal to new hidden layer weights size [" + hiddenLayerToBeAddedWeightsSize + "]"
+                        "Current last hidden layer neurons size [" + penultimateLayerNeuronsSize + "] is not equal to new hidden layer weights size [" + hiddenLayerToBeAddedWeightsSize + "]"
                 );
             }
         }
