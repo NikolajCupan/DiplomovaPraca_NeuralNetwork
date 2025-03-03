@@ -5,6 +5,7 @@ import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.Layers.IAccuracyLayerBase;
 import NeuralNetwork.Layers.ILossLayerBase;
 import NeuralNetwork.Layers.LayerBase;
+import NeuralNetwork.LossFunctions.BinaryCrossEntropy;
 import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import NeuralNetwork.LossFunctions.ILossFunction;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
@@ -86,6 +87,11 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
     private Batch resolveCustomCalculateGradientWithRespectToInputs() {
         if (this.lossFunction instanceof final CategoricalCrossEntropy categoricalCrossEntropy) {
             return categoricalCrossEntropy.backward(
+                    this.getSavedInputBatch(),
+                    this.getSavedTargetBatch()
+            );
+        } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
+            return binaryCrossEntropy.backward(
                     this.getSavedInputBatch(),
                     this.getSavedTargetBatch()
             );

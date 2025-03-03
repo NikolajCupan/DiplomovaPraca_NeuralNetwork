@@ -1,13 +1,13 @@
 package Utilities;
 
 import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
+import NeuralNetwork.ActivationFunctions.Sigmoid;
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
-import NeuralNetwork.BuildingBlocks.RegularizerStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
-import NeuralNetwork.Layers.Common.DropoutLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
-import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
+import NeuralNetwork.Layers.Common.LossLayer;
+import NeuralNetwork.LossFunctions.BinaryCrossEntropy;
 import NeuralNetwork.NeuralNetwork;
 
 public class Factory {
@@ -2440,22 +2440,21 @@ public class Factory {
     }
 
     public static NeuralNetwork getNeuralNetwork() {
-        final SeedGenerator seedGenerator = new SeedGenerator(111);
+        final SeedGenerator seedGenerator = new SeedGenerator();
 
         final HiddenLayer hiddenLayer1 = new HiddenLayer(2, 64, seedGenerator.getSeed());
-        // hiddenLayer1.initializeRegularizer(new RegularizerStruct(0.0, 0.0005, 0.0, 0.0005));
-        final ActivationLayer relu = new ActivationLayer(new RectifiedLinearUnit());
-        // final DropoutLayer dropoutLayer1 = new DropoutLayer(0.9, seedGenerator.getSeed());
+        final ActivationLayer activationLayer1 = new ActivationLayer(new RectifiedLinearUnit());
         final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 3, seedGenerator.getSeed());
-        final SoftmaxCategoricalCrossEntropyLayer softmaxCCE = new SoftmaxCategoricalCrossEntropyLayer();
+        final ActivationLayer activationLayer2 = new ActivationLayer(new Sigmoid());
+        final LossLayer lossLayer = new LossLayer(new BinaryCrossEntropy());
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(2);
 
         neuralNetwork.addHiddenLayer(hiddenLayer1);
-        neuralNetwork.addActivationLayer(relu);
-        // neuralNetwork.addDropoutLayer(dropoutLayer1);
+        neuralNetwork.addActivationLayer(activationLayer1);
         neuralNetwork.addHiddenLayer(hiddenLayer2);
-        neuralNetwork.addSpecialLayer(softmaxCCE);
+        neuralNetwork.addActivationLayer(activationLayer2);
+        neuralNetwork.addLossLayer(lossLayer);
         return neuralNetwork;
     }
 }

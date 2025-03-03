@@ -18,8 +18,12 @@ public class Sigmoid implements IActivationFunction {
     }
 
     @Override
-    public double derivative(final double value) {
-        return 0.0;
+    public double derivative(final double input) {
+        final DataList inputWrapper = new DataList(1);
+        inputWrapper.setValue(0, input);
+        final double output = this.activate(inputWrapper).getValue(0);
+
+        return (1.0 - output) * output;
     }
 
     @Override
