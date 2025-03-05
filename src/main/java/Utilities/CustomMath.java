@@ -94,6 +94,35 @@ public class CustomMath {
         return sum / size;
     }
 
+    public static double standardDeviation(final Batch batch) {
+        double sum = 0.0;
+        long elementsSize = 0;
+
+        for (int rowIndex = 0; rowIndex < batch.getRowsSize(); ++rowIndex) {
+            final DataList row = batch.getRow(rowIndex);
+
+            for (int i = 0; i < row.getDataListSize(); ++i) {
+                sum += row.getValue(i);
+                ++elementsSize;
+            }
+        }
+
+        final double mean = sum / elementsSize;
+
+
+        double numerator = 0.0;
+
+        for (int rowIndex = 0; rowIndex < batch.getRowsSize(); ++rowIndex) {
+            final DataList row = batch.getRow(rowIndex);
+
+            for (int i = 0; i < row.getDataListSize(); ++i) {
+                numerator += Math.pow(row.getValue(i) - mean, 2.0);
+            }
+        }
+
+        return Math.sqrt(numerator / elementsSize);
+    }
+
     public static double sum(final DataList list) {
         return CustomMath.sum(list.getDataListRawValues());
     }

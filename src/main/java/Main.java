@@ -12,17 +12,18 @@ public class Main {
         final Batch inputBatch = Factory.getInputBatch();
         final Batch targetBatch = Factory.getTargetBatch();
 
+
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
         final OptimizerBase optimizer =
                 new AdaptiveMomentum(neuralNetwork, 0.005, 0.001, 0.0000001, 0.9, 0.999);
 
-        for (int i = 0; i < 501; ++i) {
-            boolean printing = i % 1 == 0;
+        for (int i = 0; i < 2501; ++i) {
+            boolean printing = i % 250 == 0;
 
             neuralNetwork.forward(inputBatch, targetBatch, true);
 
             if (printing) {
-                final double accuracy = -1.0;
+                final double accuracy = /* -1.0; */ neuralNetwork.getAccuracy();
                 final double loss = neuralNetwork.getLoss();
                 final double regularizedLoss = neuralNetwork.getRegularizedLoss();
                 System.out.printf(
@@ -53,8 +54,21 @@ public class Main {
 
         neuralNetwork.forward(testInputBatch, testTargetBatch, false);
 
-        final double accuracy = -1.0;
+        final double accuracy = neuralNetwork.getAccuracy();
         final double loss = neuralNetwork.getLoss();
+
+        final Batch predictions = neuralNetwork.getLayers().get(6).getSavedInputBatch();
+        final Batch targets = neuralNetwork.getLayers().get(6).getSavedTargetBatch();
+
+        System.out.print("{\n");
+        for (int i = 0; i < predictions.getRowsSize(); ++i) {
+            final double prediction = predictions.getRow(i).getValue(0);
+            final double target = targets.getRow(i).getValue(0);
+
+            System.out.print("\t[ " + target + ", " + prediction + " ]\n");
+        }
+        System.out.print("}\n\n");
+
         System.out.print("accuracy: " + accuracy + ", loss: " + loss);
     }
 }

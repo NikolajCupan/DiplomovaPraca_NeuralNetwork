@@ -28,6 +28,11 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
                     this.getSavedInputBatch(),
                     this.getSavedTargetBatch()
             );
+        } else if (this.lossFunction instanceof final MeanSquaredError meanSquaredError) {
+            return meanSquaredError.getAccuracy(
+                    this.getSavedInputBatch(),
+                    this.getSavedTargetBatch()
+            );
         } else {
             throw new RuntimeException("Loss layer cannot be used to calculate accuracy");
         }

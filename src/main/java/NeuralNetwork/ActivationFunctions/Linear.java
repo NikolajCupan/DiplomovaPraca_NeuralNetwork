@@ -19,7 +19,7 @@ public class Linear implements IActivationFunction {
 
     @Override
     public double derivative(final double input) {
-        return input;
+        return 1.0;
     }
 
     @Override
