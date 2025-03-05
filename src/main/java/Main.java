@@ -9,15 +9,15 @@ public class Main {
     public static void main(String[] args) {
         final long startTime = System.currentTimeMillis();
 
-        final Batch inputBatch = Factory.getRealInputBatch();
-        final Batch targetBatch = Factory.getRealTargetBatch();
+        final Batch inputBatch = Factory.getInputBatch();
+        final Batch targetBatch = Factory.getTargetBatch();
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
         final OptimizerBase optimizer =
-                new AdaptiveMomentum(neuralNetwork, 0.001, 0.0001, 0.0000001, 0.9, 0.999);
+                new AdaptiveMomentum(neuralNetwork, 0.001, 0.0000005, 0.0000001, 0.9, 0.999);
 
-        for (int i = 0; i < 10001; ++i) {
-            boolean printing = i % 1000 == 0;
+        for (int i = 0; i < 5001; ++i) {
+            boolean printing = i % 500 == 0;
 
             neuralNetwork.forward(inputBatch, targetBatch, true);
 
@@ -48,8 +48,8 @@ public class Main {
         System.out.println("Time needed: " + (endTime - startTime) + " ms");
 
 
-        final Batch testInputBatch = Factory.getRealTestingInputBatch();
-        final Batch testTargetBatch = Factory.getRealTestingTargetBatch();
+        final Batch testInputBatch = Factory.getTestingInputBatch();
+        final Batch testTargetBatch = Factory.getTestingTargetBatch();
 
         neuralNetwork.forward(testInputBatch, testTargetBatch, false);
 
