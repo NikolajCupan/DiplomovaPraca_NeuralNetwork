@@ -5,9 +5,7 @@ import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.Layers.IAccuracyLayerBase;
 import NeuralNetwork.Layers.ILossLayerBase;
 import NeuralNetwork.Layers.LayerBase;
-import NeuralNetwork.LossFunctions.BinaryCrossEntropy;
-import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
-import NeuralNetwork.LossFunctions.ILossFunction;
+import NeuralNetwork.LossFunctions.*;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
 
 public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLayerBase  {
@@ -43,6 +41,14 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
             );
         } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
             return binaryCrossEntropy.getLoss(
+                    this.getSavedOutputBatch()
+            );
+        } else if (this.lossFunction instanceof final MeanSquaredError meanSquaredError) {
+            return meanSquaredError.getLoss(
+                    this.getSavedOutputBatch()
+            );
+        } else if (this.lossFunction instanceof final MeanAbsoluteError meanAbsoluteError) {
+            return meanAbsoluteError.getLoss(
                     this.getSavedOutputBatch()
             );
         } else {
@@ -93,6 +99,16 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
             );
         } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
             return binaryCrossEntropy.backward(
+                    this.getSavedInputBatch(),
+                    this.getSavedTargetBatch()
+            );
+        } else if (this.lossFunction instanceof final MeanSquaredError meanSquaredError) {
+            return meanSquaredError.backward(
+                    this.getSavedInputBatch(),
+                    this.getSavedTargetBatch()
+            );
+        } else if (this.lossFunction instanceof final MeanAbsoluteError meanAbsoluteError) {
+            return meanAbsoluteError.backward(
                     this.getSavedInputBatch(),
                     this.getSavedTargetBatch()
             );

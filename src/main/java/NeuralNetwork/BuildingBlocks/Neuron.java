@@ -5,7 +5,7 @@ import Utilities.CustomMath;
 import java.util.Random;
 
 public class Neuron {
-    private static final double RANDOM_VALUES_SCALE = 0.01;
+    private static final double RANDOM_VALUES_SCALE = 0.1;
 
     private double bias;
     private final DataList weights;
