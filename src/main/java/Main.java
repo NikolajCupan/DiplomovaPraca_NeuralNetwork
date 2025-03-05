@@ -1,3 +1,4 @@
+import GUI.GUI;
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.NeuralNetwork;
 import NeuralNetwork.Optimizers.AdaptiveMomentum;
@@ -7,20 +8,26 @@ import Utilities.Helper;
 
 public class Main {
     public static void main(String[] args) {
+        final GUI gui = new GUI();
+
         final long startTime = System.currentTimeMillis();
 
-        final Batch inputBatch = Factory.getInputBatch();
-        final Batch targetBatch = Factory.getTargetBatch();
+
+        final Batch trainInputBatch = Factory.getTrainInputBatch();
+        final Batch trainTargetBatch = Factory.getTargetBatch();
+
+        final Batch testInputBatch = Factory.getTestInputBatch();
+        final Batch testTargetBatch = Factory.getTestTargetBatch();
 
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork();
         final OptimizerBase optimizer =
-                new AdaptiveMomentum(neuralNetwork, 0.005, 0.001, 0.0000001, 0.9, 0.999);
+                new AdaptiveMomentum(neuralNetwork, 0.01, 0.001, 0.0000001, 0.9, 0.999);
 
-        for (int i = 0; i < 2501; ++i) {
-            boolean printing = i % 250 == 0;
+        for (int i = 0; i < 551; ++i) {
+            boolean printing = i % 50 == 0;
 
-            neuralNetwork.forward(inputBatch, targetBatch, true);
+            neuralNetwork.forward(trainInputBatch, trainTargetBatch, true);
 
             if (printing) {
                 final double accuracy = neuralNetwork.getAccuracyForPrinting();
@@ -49,7 +56,14 @@ public class Main {
         System.out.println("Time needed: " + (endTime - startTime) + " ms");
 
 
-        final Batch testInputBatch = Factory.getTestingInputBatch();
+        neuralNetwork.forward(testInputBatch, testTargetBatch, true);
+
+        final Batch predictions = neuralNetwork.getLayers().get(6).getSavedInputBatch();
+        final Batch targets = neuralNetwork.getLayers().get(6).getSavedTargetBatch();
+
+        gui.show(predictions.getColumn(0), targets.getColumn(0));
+
+        /* final Batch testInputBatch = Factory.getTestingInputBatch();
         final Batch testTargetBatch = Factory.getTestingTargetBatch();
 
         neuralNetwork.forward(testInputBatch, testTargetBatch, false);
@@ -69,6 +83,6 @@ public class Main {
         }
         System.out.print("}\n\n");
 
-        System.out.print("accuracy: " + accuracy + ", loss: " + loss);
+        System.out.print("accuracy: " + accuracy + ", loss: " + loss); */
     }
 }
