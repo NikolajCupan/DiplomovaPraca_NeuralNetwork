@@ -5,8 +5,8 @@ import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.DropoutLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
-import NeuralNetwork.Layers.IAccuracyLayerBase;
-import NeuralNetwork.Layers.ILossLayerBase;
+import NeuralNetwork.Layers.IAccuracyForPrintingGetter;
+import NeuralNetwork.Layers.ILossForPrintingGetter;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
 
@@ -55,36 +55,36 @@ public class NeuralNetwork {
         this.globalRegularizerStruct = Optional.of(regularizer);
     }
 
-    public double getAccuracy() {
+    public double getAccuracyForPrinting() {
         if (!this.forwardStepExecuted) {
             throw new RuntimeException("Cannot calculate accuracy before forward step");
         }
 
         final LayerBase lastLayer = this.layers.getLast();
 
-        if (lastLayer instanceof final IAccuracyLayerBase lossLayer) {
-            return lossLayer.getAccuracy();
+        if (lastLayer instanceof final IAccuracyForPrintingGetter lossLayer) {
+            return lossLayer.getAccuracyForPrinting();
         } else {
             throw new RuntimeException("Last layer cannot be used to calculate accuracy");
         }
     }
 
-    public double getLoss() {
+    public double getLossForPrinting() {
         if (!this.forwardStepExecuted) {
             throw new RuntimeException("Cannot calculate loss before forward step");
         }
 
         final LayerBase lastLayer = this.layers.getLast();
 
-        if (lastLayer instanceof final ILossLayerBase lossLayer) {
-            return lossLayer.getLoss();
+        if (lastLayer instanceof final ILossForPrintingGetter lossLayer) {
+            return lossLayer.getLossForPrinting();
         } else {
             throw new RuntimeException("Last layer cannot be used to calculate loss");
         }
     }
 
     public double getRegularizedLoss() {
-        double regularizedLoss = this.getLoss();
+        double regularizedLoss = this.getLossForPrinting();
 
         for (final LayerBase layer : this.layers) {
             if (layer instanceof final HiddenLayer hiddenLayer && hiddenLayer.isRegularizerPresent()) {

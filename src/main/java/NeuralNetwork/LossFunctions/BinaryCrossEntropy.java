@@ -36,7 +36,8 @@ public class BinaryCrossEntropy implements ILossFunction {
         return gradientWRTInputs;
     }
 
-    public double getAccuracy(final Batch predictedBatch, final Batch targetBatch) {
+    @Override
+    public double getAccuracyForPrinting(final Batch predictedBatch, final Batch targetBatch) {
         assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
 
         final DataList correctPredictionsList = new DataList(predictedBatch.getRowsSize());
@@ -60,11 +61,6 @@ public class BinaryCrossEntropy implements ILossFunction {
         }
 
         return CustomMath.mean(correctPredictionsList);
-    }
-
-    public double getLoss(final Batch savedOutputBatch) {
-        final DataList savedOutput = savedOutputBatch.getRow(0);
-        return CustomMath.mean(savedOutput);
     }
 
     @Override

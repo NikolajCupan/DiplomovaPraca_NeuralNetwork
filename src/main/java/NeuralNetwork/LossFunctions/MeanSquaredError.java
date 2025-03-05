@@ -4,7 +4,7 @@ import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import Utilities.CustomMath;
 
-public class MeanSquaredError implements ILossFunction {
+public class MeanSquaredError implements IRegressionLossFunction {
     // "inputBatch" can be for example output from Linear activation layer,
     // that means in loss layer it is an input
     public Batch backward(final Batch inputBatch, final Batch targetBatch) {
@@ -33,40 +33,6 @@ public class MeanSquaredError implements ILossFunction {
         return gradientWRTInputs;
     }
 
-    public double getAccuracy(final Batch predictedBatch, final Batch targetBatch) {
-        assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
-
-        final double targetBatchStandardDeviation = CustomMath.standardDeviation(targetBatch);
-        final double precision = targetBatchStandardDeviation / 250.0;
-
-        final DataList correctPredictionsList = new DataList(predictedBatch.getRowsSize());
-
-        for (int rowIndex = 0; rowIndex < predictedBatch.getRowsSize(); ++rowIndex) {
-            final DataList predictedRow = predictedBatch.getRow(rowIndex);
-            final DataList targetRow = targetBatch.getRow(rowIndex);
-
-            double correctPredictions = 0.0;
-
-            for (int i = 0; i < predictedRow.getDataListSize(); ++i) {
-                final double prediction = predictedRow.getValue(i);
-                final double target = targetRow.getValue(i);
-
-                if (Math.abs(prediction - target) < precision) {
-                    correctPredictions += 1.0;
-                }
-            }
-
-            correctPredictionsList.setValue(rowIndex, correctPredictions / predictedRow.getDataListSize());
-        }
-
-        return CustomMath.mean(correctPredictionsList);
-    }
-
-    public double getLoss(final Batch savedOutputBatch) {
-        final DataList savedOutput = savedOutputBatch.getRow(0);
-        return CustomMath.mean(savedOutput);
-    }
-
     @Override
     public double loss(final DataList predictedRow, final DataList targetRow) {
         if (predictedRow.getDataListSize() != targetRow.getDataListSize()) {
@@ -84,5 +50,10 @@ public class MeanSquaredError implements ILossFunction {
         }
 
         return CustomMath.mean(losses);
+    }
+
+    @Override
+    public String toString() {
+        return "Mean squared error";
     }
 }

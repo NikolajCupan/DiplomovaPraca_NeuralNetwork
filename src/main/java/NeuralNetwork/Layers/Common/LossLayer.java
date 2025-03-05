@@ -2,13 +2,13 @@ package NeuralNetwork.Layers.Common;
 
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
-import NeuralNetwork.Layers.IAccuracyLayerBase;
-import NeuralNetwork.Layers.ILossLayerBase;
+import NeuralNetwork.Layers.IAccuracyForPrintingGetter;
+import NeuralNetwork.Layers.ILossForPrintingGetter;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.LossFunctions.*;
 import NeuralNetwork.BuildingBlocks.GradientStruct;
 
-public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLayerBase  {
+public class LossLayer extends LayerBase implements IAccuracyForPrintingGetter, ILossForPrintingGetter {
     private final ILossFunction lossFunction;
 
     public LossLayer(final ILossFunction lossFunction) {
@@ -16,49 +16,17 @@ public class LossLayer extends LayerBase implements IAccuracyLayerBase, ILossLay
         this.lossFunction = lossFunction;
     }
 
-    @Override
-    public double getAccuracy() {
-        if (this.lossFunction instanceof final CategoricalCrossEntropy categoricalCrossEntropy) {
-            return categoricalCrossEntropy.getAccuracy(
-                    this.getSavedInputBatch(),
-                    this.getSavedTargetBatch()
-            );
-        } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
-            return binaryCrossEntropy.getAccuracy(
-                    this.getSavedInputBatch(),
-                    this.getSavedTargetBatch()
-            );
-        } else if (this.lossFunction instanceof final MeanSquaredError meanSquaredError) {
-            return meanSquaredError.getAccuracy(
-                    this.getSavedInputBatch(),
-                    this.getSavedTargetBatch()
-            );
-        } else {
-            throw new RuntimeException("Loss layer cannot be used to calculate accuracy");
-        }
+    public double getAccuracyForPrinting() {
+        return this.lossFunction.getAccuracyForPrinting(
+                this.getSavedInputBatch(),
+                this.getSavedTargetBatch()
+        );
     }
 
-    @Override
-    public double getLoss() {
-        if (this.lossFunction instanceof final CategoricalCrossEntropy categoricalCrossEntropy) {
-            return categoricalCrossEntropy.getLoss(
-                   this.getSavedOutputBatch()
-            );
-        } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
-            return binaryCrossEntropy.getLoss(
-                    this.getSavedOutputBatch()
-            );
-        } else if (this.lossFunction instanceof final MeanSquaredError meanSquaredError) {
-            return meanSquaredError.getLoss(
-                    this.getSavedOutputBatch()
-            );
-        } else if (this.lossFunction instanceof final MeanAbsoluteError meanAbsoluteError) {
-            return meanAbsoluteError.getLoss(
-                    this.getSavedOutputBatch()
-            );
-        } else {
-            throw new RuntimeException("Loss layer cannot be used to calculate loss");
-        }
+    public double getLossForPrinting() {
+        return this.lossFunction.getLossForPrinting(
+                this.getSavedOutputBatch()
+        );
     }
 
     @Override

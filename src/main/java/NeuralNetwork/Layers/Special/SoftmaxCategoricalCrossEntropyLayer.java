@@ -7,13 +7,13 @@ import NeuralNetwork.BuildingBlocks.GradientStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
-import NeuralNetwork.Layers.IAccuracyLayerBase;
-import NeuralNetwork.Layers.ILossLayerBase;
+import NeuralNetwork.Layers.IAccuracyForPrintingGetter;
+import NeuralNetwork.Layers.ILossForPrintingGetter;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.LossFunctions.CategoricalCrossEntropy;
 import Utilities.CustomMath;
 
-public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase implements IAccuracyLayerBase, ILossLayerBase {
+public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase implements IAccuracyForPrintingGetter, ILossForPrintingGetter {
     private final ActivationLayer softmaxActivationLayer;
     private final LossLayer categoricalCrossEntropyLossLayer;
 
@@ -25,13 +25,13 @@ public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase implements IA
     }
 
     @Override
-    public double getAccuracy() {
-        return this.categoricalCrossEntropyLossLayer.getAccuracy();
+    public double getAccuracyForPrinting() {
+        return this.categoricalCrossEntropyLossLayer.getAccuracyForPrinting();
     }
 
     @Override
-    public double getLoss() {
-        return this.categoricalCrossEntropyLossLayer.getLoss();
+    public double getLossForPrinting() {
+        return this.categoricalCrossEntropyLossLayer.getLossForPrinting();
     }
 
     @Override

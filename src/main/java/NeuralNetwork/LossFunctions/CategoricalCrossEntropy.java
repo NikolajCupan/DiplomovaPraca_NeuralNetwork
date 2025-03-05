@@ -34,7 +34,8 @@ public class CategoricalCrossEntropy implements ILossFunction {
         return gradientWRTInputs;
     }
 
-    public double getAccuracy(final Batch predictedBatch, final Batch targetBatch) {
+    @Override
+    public double getAccuracyForPrinting(final Batch predictedBatch, final Batch targetBatch) {
         assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
 
         final int rowsSize = predictedBatch.getRowsSize();
@@ -53,11 +54,6 @@ public class CategoricalCrossEntropy implements ILossFunction {
         }
 
         return (double)correctPredictionsSize / rowsSize;
-    }
-
-    public double getLoss(final Batch savedOutputBatch) {
-        final DataList savedOutput = savedOutputBatch.getRow(0);
-        return CustomMath.mean(savedOutput);
     }
 
     @Override

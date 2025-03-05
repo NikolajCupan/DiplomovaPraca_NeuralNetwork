@@ -4,7 +4,7 @@ import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import Utilities.CustomMath;
 
-public class MeanAbsoluteError implements ILossFunction {
+public class MeanAbsoluteError implements IRegressionLossFunction {
     // "inputBatch" can be for example output from Linear activation layer,
     // that means in loss layer it is an input
     public Batch backward(final Batch inputBatch, final Batch targetBatch) {
@@ -36,11 +36,6 @@ public class MeanAbsoluteError implements ILossFunction {
         return gradientWRTInputs;
     }
 
-    public double getLoss(final Batch savedOutputBatch) {
-        final DataList savedOutput = savedOutputBatch.getRow(0);
-        return CustomMath.mean(savedOutput);
-    }
-
     @Override
     public double loss(final DataList predictedRow, final DataList targetRow) {
         if (predictedRow.getDataListSize() != targetRow.getDataListSize()) {
@@ -58,5 +53,10 @@ public class MeanAbsoluteError implements ILossFunction {
         }
 
         return CustomMath.mean(losses);
+    }
+
+    @Override
+    public String toString() {
+        return "Mean absolute error";
     }
 }

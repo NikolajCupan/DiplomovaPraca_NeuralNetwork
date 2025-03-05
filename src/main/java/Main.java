@@ -23,8 +23,8 @@ public class Main {
             neuralNetwork.forward(inputBatch, targetBatch, true);
 
             if (printing) {
-                final double accuracy = /* -1.0; */ neuralNetwork.getAccuracy();
-                final double loss = neuralNetwork.getLoss();
+                final double accuracy = neuralNetwork.getAccuracyForPrinting();
+                final double loss = neuralNetwork.getLossForPrinting();
                 final double regularizedLoss = neuralNetwork.getRegularizedLoss();
                 System.out.printf(
                         "epoch: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
@@ -54,8 +54,8 @@ public class Main {
 
         neuralNetwork.forward(testInputBatch, testTargetBatch, false);
 
-        final double accuracy = neuralNetwork.getAccuracy();
-        final double loss = neuralNetwork.getLoss();
+        final double accuracy = neuralNetwork.getAccuracyForPrinting();
+        final double loss = neuralNetwork.getLossForPrinting();
 
         final Batch predictions = neuralNetwork.getLayers().get(6).getSavedInputBatch();
         final Batch targets = neuralNetwork.getLayers().get(6).getSavedTargetBatch();
