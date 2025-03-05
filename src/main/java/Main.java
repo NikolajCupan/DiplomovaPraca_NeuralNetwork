@@ -25,7 +25,7 @@ public class Main {
             if (printing) {
                 final double accuracy = neuralNetwork.getAccuracyForPrinting();
                 final double loss = neuralNetwork.getLossForPrinting();
-                final double regularizedLoss = neuralNetwork.getRegularizedLoss();
+                final double regularizedLoss = neuralNetwork.getRegularizedLossForPrinting();
                 System.out.printf(
                         "epoch: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
                         i,

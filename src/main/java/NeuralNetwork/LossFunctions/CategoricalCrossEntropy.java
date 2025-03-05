@@ -7,8 +7,7 @@ import Utilities.CustomMath;
 public class CategoricalCrossEntropy implements ILossFunction {
     private static final double CLAMP_VALUE = 0.0000001;
 
-    // "inputBatch" can be for example output from Softmax activation layer,
-    // that means in loss layer it is an input
+    @Override
     public Batch backward(final Batch inputBatch, final Batch targetBatch) {
         final int inputBatchRowsSize = inputBatch.getRowsSize();
         final int inputBatchColumnsSize = inputBatch.getColumnsSize();

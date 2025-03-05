@@ -59,35 +59,9 @@ public class LossLayer extends LayerBase implements IAccuracyForPrintingGetter, 
 
         final GradientStruct outputGradientStruct = new GradientStruct();
         outputGradientStruct.setGradientWithRespectToInputs(
-                this.resolveCustomCalculateGradientWithRespectToInputs()
-        );
+                this.lossFunction.backward(this.getSavedInputBatch(), this.getSavedTargetBatch()
+        ));
         this.setSavedOutputGradientStruct(outputGradientStruct);
-    }
-
-    private Batch resolveCustomCalculateGradientWithRespectToInputs() {
-        if (this.lossFunction instanceof final CategoricalCrossEntropy categoricalCrossEntropy) {
-            return categoricalCrossEntropy.backward(
-                    this.getSavedInputBatch(),
-                    this.getSavedTargetBatch()
-            );
-        } else if (this.lossFunction instanceof final BinaryCrossEntropy binaryCrossEntropy) {
-            return binaryCrossEntropy.backward(
-                    this.getSavedInputBatch(),
-                    this.getSavedTargetBatch()
-            );
-        } else if (this.lossFunction instanceof final MeanSquaredError meanSquaredError) {
-            return meanSquaredError.backward(
-                    this.getSavedInputBatch(),
-                    this.getSavedTargetBatch()
-            );
-        } else if (this.lossFunction instanceof final MeanAbsoluteError meanAbsoluteError) {
-            return meanAbsoluteError.backward(
-                    this.getSavedInputBatch(),
-                    this.getSavedTargetBatch()
-            );
-        } else {
-            throw new IllegalArgumentException("Custom backward step is not available for this type of loss function");
-        }
     }
 
     @Override

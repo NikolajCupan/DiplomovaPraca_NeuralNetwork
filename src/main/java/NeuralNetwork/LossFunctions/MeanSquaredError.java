@@ -5,8 +5,7 @@ import NeuralNetwork.BuildingBlocks.DataList;
 import Utilities.CustomMath;
 
 public class MeanSquaredError implements IRegressionLossFunction {
-    // "inputBatch" can be for example output from Linear activation layer,
-    // that means in loss layer it is an input
+    @Override
     public Batch backward(final Batch inputBatch, final Batch targetBatch) {
         final int inputBatchRowsSize = inputBatch.getRowsSize();
         final int inputBatchColumnsSize = inputBatch.getColumnsSize();

@@ -83,7 +83,7 @@ public class NeuralNetwork {
         }
     }
 
-    public double getRegularizedLoss() {
+    public double getRegularizedLossForPrinting() {
         double regularizedLoss = this.getLossForPrinting();
 
         for (final LayerBase layer : this.layers) {
