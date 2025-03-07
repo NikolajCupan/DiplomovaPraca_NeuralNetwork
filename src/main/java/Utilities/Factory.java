@@ -9,6 +9,8 @@ import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
 import NeuralNetwork.LossFunctions.MeanSquaredError;
 import NeuralNetwork.NeuralNetwork;
+import NeuralNetwork.Optimizers.AdaptiveMomentum;
+import NeuralNetwork.Optimizers.OptimizerBase;
 
 public class Factory {
     public static Batch getTrainInputBatch() {
@@ -1118,30 +1120,27 @@ public class Factory {
     }
 
     public static NeuralNetwork getNeuralNetwork() {
-        final HiddenLayer hiddenLayer1 = new HiddenLayer(15, 64);
-        final ActivationLayer activationLayer1 = new ActivationLayer(new RectifiedLinearUnit());
-
-        final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 64);
-        final ActivationLayer activationLayer2 = new ActivationLayer(new Linear());
-
-        final HiddenLayer hiddenLayer3 = new HiddenLayer(64, 1);
-        final ActivationLayer activationLayer3 = new ActivationLayer(new Linear());
-
-        final LossLayer lossLayer1 = new LossLayer(new MeanSquaredError());
+        final SeedGenerator seedGenerator = new SeedGenerator(420);
 
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(15);
 
-        neuralNetwork.addHiddenLayer(hiddenLayer1);
-        neuralNetwork.addActivationLayer(activationLayer1);
+        neuralNetwork.addHiddenLayer(new HiddenLayer(15, 64, seedGenerator.getSeed()));
+        neuralNetwork.addActivationLayer(new ActivationLayer(new RectifiedLinearUnit()));
 
-        neuralNetwork.addHiddenLayer(hiddenLayer2);
-        neuralNetwork.addActivationLayer(activationLayer2);
+        neuralNetwork.addHiddenLayer(new HiddenLayer(64, 64, seedGenerator.getSeed()));
+        neuralNetwork.addActivationLayer(new ActivationLayer(new Linear()));
 
-        neuralNetwork.addHiddenLayer(hiddenLayer3);
-        neuralNetwork.addActivationLayer(activationLayer3);
+        neuralNetwork.addHiddenLayer(new HiddenLayer(64, 1, seedGenerator.getSeed()));
+        neuralNetwork.addActivationLayer(new ActivationLayer(new Linear()));
 
-        neuralNetwork.addLossLayer(lossLayer1);
+        neuralNetwork.addLossLayer(new LossLayer(new MeanSquaredError()));
+
+
+        final OptimizerBase optimizer =
+                new AdaptiveMomentum(neuralNetwork, 0.01, 0.001, 0.0000001, 0.9, 0.999);
+        neuralNetwork.setOptimizer(optimizer);
+
 
         return neuralNetwork;
     }

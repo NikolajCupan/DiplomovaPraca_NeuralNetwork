@@ -9,6 +9,8 @@ import NeuralNetwork.Layers.IAccuracyForPrintingGetter;
 import NeuralNetwork.Layers.ILossForPrintingGetter;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
+import NeuralNetwork.Optimizers.OptimizerBase;
+import Utilities.Helper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,19 +20,15 @@ public class NeuralNetwork {
     private final int inputSize;
     private final List<LayerBase> layers;
 
-    private boolean forwardStepExecuted;
-    private boolean backwardStepExecuted;
-
     private Optional<RegularizerStruct> globalRegularizerStruct;
+    private Optional<OptimizerBase> optimizer;
 
     public NeuralNetwork(final int inputSize) {
         this.inputSize = inputSize;
         this.layers = new ArrayList<>();
 
-        this.forwardStepExecuted = false;
-        this.backwardStepExecuted = false;
-
         this.globalRegularizerStruct = Optional.empty();
+        this.optimizer = Optional.empty();
     }
 
     public void initializeGlobalRegularizer(
@@ -55,11 +53,7 @@ public class NeuralNetwork {
         this.globalRegularizerStruct = Optional.of(regularizer);
     }
 
-    public double getAccuracyForPrinting() {
-        if (!this.forwardStepExecuted) {
-            throw new RuntimeException("Cannot calculate accuracy before forward step");
-        }
-
+    private double getAccuracyForPrinting() {
         final LayerBase lastLayer = this.layers.getLast();
 
         if (lastLayer instanceof final IAccuracyForPrintingGetter lossLayer) {
@@ -69,11 +63,7 @@ public class NeuralNetwork {
         }
     }
 
-    public double getLossForPrinting() {
-        if (!this.forwardStepExecuted) {
-            throw new RuntimeException("Cannot calculate loss before forward step");
-        }
-
+    private double getLossForPrinting() {
         final LayerBase lastLayer = this.layers.getLast();
 
         if (lastLayer instanceof final ILossForPrintingGetter lossLayer) {
@@ -83,7 +73,7 @@ public class NeuralNetwork {
         }
     }
 
-    public double getRegularizedLossForPrinting() {
+    private double getRegularizedLossForPrinting() {
         double regularizedLoss = this.getLossForPrinting();
 
         for (final LayerBase layer : this.layers) {
@@ -95,19 +85,61 @@ public class NeuralNetwork {
         return regularizedLoss;
     }
 
-    public boolean isBackwardStepExecuted() {
-        return this.backwardStepExecuted;
-    }
-
     public List<LayerBase> getLayers() {
         return this.layers;
     }
 
-    public void forward(final Batch inputBatch, final Batch targetBatch, final boolean includeDropoutLayers) {
+    public void train(final Batch inputBatch, final Batch targetBatch, final int epochsSize, final int printStep) {
         if (!this.isLastLayerSuitable()) {
             throw new RuntimeException("Cannot perform forward method, last layer is not suitable");
+        } else if (this.optimizer.isEmpty()) {
+            throw new RuntimeException("Cannot perform training, optimizer is empty");
         }
 
+        for (int epoch = 1; epoch < epochsSize + 1; ++epoch) {
+            boolean printing = (epoch % printStep == 0);
+
+            this.forward(inputBatch, targetBatch, true);
+
+            if (printing) {
+                final double accuracy = this.getAccuracyForPrinting();
+                final double loss = this.getLossForPrinting();
+                final double regularizedLoss = this.getRegularizedLossForPrinting();
+
+                System.out.printf(
+                        "epoch: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
+                        epoch,
+                        Helper.formatNumber(accuracy, 5),
+                        Helper.formatNumber(loss, 5),
+                        Helper.formatNumber(regularizedLoss, 5)
+                );
+            }
+
+            this.backward();
+            this.optimizer.get().performOptimization();
+            this.clearState();
+
+            if (printing) {
+                final double learningRate = this.optimizer.get().getCurrentLearningRate();
+                System.out.printf("%-15s%n", "lr: " + learningRate);
+            }
+        }
+    }
+
+    public void test(final Batch inputBatch, final Batch targetBatch) {
+        this.forward(inputBatch, targetBatch, false);
+
+        final double accuracy = this.getAccuracyForPrinting();
+        final double loss = this.getLossForPrinting();
+
+        System.out.printf(
+                "accuracy: %-15s loss: %-15s",
+                Helper.formatNumber(accuracy, 5),
+                Helper.formatNumber(loss, 5)
+        );
+    }
+
+    private void forward(final Batch inputBatch, final Batch targetBatch, final boolean includeDropoutLayers) {
         final List<LayerBase> usedLayers = new ArrayList<>();
         for (final LayerBase layer : this.layers) {
             if (includeDropoutLayers || !(layer instanceof DropoutLayer)) {
@@ -127,15 +159,9 @@ public class NeuralNetwork {
 
             currentLayer.forward(previousLayer.getSavedOutputBatch());
         }
-
-        this.forwardStepExecuted = true;
     }
 
-    public void backward() {
-        if (!this.forwardStepExecuted) {
-            throw new RuntimeException("Cannot perform backward step before forward step");
-        }
-
+    private void backward() {
         final LayerBase lastLayer = this.layers.getLast();
         lastLayer.backward(new GradientStruct());
 
@@ -145,18 +171,9 @@ public class NeuralNetwork {
 
             previousLayer.backward(currentLayer.getSavedOutputGradientStruct());
         }
-
-        this.backwardStepExecuted = true;
     }
 
-    public void clearState() {
-        if (!this.backwardStepExecuted) {
-            throw new RuntimeException("Cannot clear state before backward step");
-        }
-
-        this.forwardStepExecuted = false;
-        this.backwardStepExecuted = false;
-
+    private void clearState() {
         for (final LayerBase layer : this.layers) {
             layer.clearState();
         }
@@ -255,6 +272,16 @@ public class NeuralNetwork {
         } else {
             throw new IllegalArgumentException("Unknown special layer type");
         }
+    }
+
+    public void setOptimizer(final OptimizerBase optimizer) {
+        if (!this.isLastLayerSuitable()) {
+            throw new IllegalArgumentException("Optimizer must be set when all layers are already present");
+        } else if (this.optimizer.isPresent()) {
+            throw new IllegalArgumentException("Optimizer is already set");
+        }
+
+        this.optimizer = Optional.of(optimizer);
     }
 
     private static <T extends LayerBase> T getLayerAsType(final List<LayerBase> layers, final int index, final Class<T> type) {

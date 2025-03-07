@@ -9,8 +9,21 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
+import java.util.List;
 
 public class GUI extends JFrame {
+    public static class ChartData {
+        private final DataList list;
+        private final String name;
+        private final int startIndex;
+
+        public ChartData(final DataList list, final String name, final int startIndex) {
+            this.list = list;
+            this.name = name;
+            this.startIndex = startIndex;
+        }
+    }
+
     private JPanel panel;
     private ChartPanel chartPanel;
 
@@ -27,12 +40,7 @@ public class GUI extends JFrame {
     }
 
     public void createUIComponents() {
-        final XYSeries predictedSeries = new XYSeries("predicted");
-        final XYSeries targetSeries = new XYSeries("target");
-
         final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(predictedSeries);
-        dataset.addSeries(targetSeries);
 
         this.customChart = ChartFactory.createXYLineChart(
                 "Chart",
@@ -49,16 +57,16 @@ public class GUI extends JFrame {
         this.chartPanel = new ChartPanel(this.customChart);
     }
 
-    public void show(final DataList predicted, final DataList target) {
-        final double[] predictedRawValues = predicted.getDataListRawValues();
-        final double[] targetRawValues = target.getDataListRawValues();
+    public void show(final List<ChartData> newData) {
+        for (final ChartData chartData : newData) {
+            final double[] rawValues = chartData.list.getDataListRawValues();
+            final XYSeries series = new XYSeries(chartData.name);
 
-        final XYSeries predictedSeries = this.data.getSeries("predicted");
-        final XYSeries targetSeries = this.data.getSeries("target");
+            for (int i = 0; i < rawValues.length; ++i) {
+                series.add(i + chartData.startIndex, rawValues[i]);
+            }
 
-        for (int i = 0; i < predictedRawValues.length; ++i) {
-            predictedSeries.add(i, predictedRawValues[i]);
-            targetSeries.add(i, targetRawValues[i]);
+            this.data.addSeries(series);
         }
 
         this.customChart.fireChartChanged();

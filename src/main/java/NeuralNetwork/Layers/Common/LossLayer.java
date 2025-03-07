@@ -16,6 +16,7 @@ public class LossLayer extends LayerBase implements IAccuracyForPrintingGetter, 
         this.lossFunction = lossFunction;
     }
 
+    @Override
     public double getAccuracyForPrinting() {
         return this.lossFunction.getAccuracyForPrinting(
                 this.getSavedInputBatch(),
@@ -23,6 +24,7 @@ public class LossLayer extends LayerBase implements IAccuracyForPrintingGetter, 
         );
     }
 
+    @Override
     public double getLossForPrinting() {
         return this.lossFunction.getLossForPrinting(
                 this.getSavedOutputBatch()

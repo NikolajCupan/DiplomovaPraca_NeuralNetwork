@@ -24,10 +24,6 @@ public abstract class OptimizerBase {
     }
 
     public void performOptimization() {
-        if (!this.neuralNetwork.isBackwardStepExecuted()) {
-            throw new RuntimeException("Cannot perform optimization step before backward step");
-        }
-
         this.optimize();
         ++this.currentIteration;
     }
