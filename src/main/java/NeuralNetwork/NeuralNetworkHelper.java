@@ -205,7 +205,7 @@ public class NeuralNetworkHelper {
         return null;
     }
 
-    public static void loadGlobalRegularizer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
+    private static void loadGlobalRegularizer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
         final String line = bufferedReader.readLine();
         final String[] parts = line.split(",");
 
@@ -219,7 +219,7 @@ public class NeuralNetworkHelper {
         neuralNetwork.initializeGlobalRegularizer(globalRegularizer);
     }
 
-    public static void loadHiddenLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
+    private static void loadHiddenLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
         final HiddenLayer hiddenLayer = new HiddenLayer();
 
         String line = bufferedReader.readLine();
@@ -260,12 +260,12 @@ public class NeuralNetworkHelper {
         neuralNetwork.addHiddenLayer(hiddenLayer);
     }
 
-    public static void loadDropoutLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
+    private static void loadDropoutLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
         final double keptRate = Double.parseDouble(bufferedReader.readLine());
         neuralNetwork.addDropoutLayer(new DropoutLayer(keptRate));
     }
 
-    public static void loadActivationLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
+    private static void loadActivationLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
         final String activationFunctionName = bufferedReader.readLine();
         IActivationFunction activationFunction;
 
@@ -280,7 +280,7 @@ public class NeuralNetworkHelper {
         neuralNetwork.addActivationLayer(new ActivationLayer(activationFunction));
     }
 
-    public static void loadLossLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
+    private static void loadLossLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) throws Exception {
         final String lossFunctionName = bufferedReader.readLine();
         ILossFunction lossFunction;
 
@@ -305,7 +305,7 @@ public class NeuralNetworkHelper {
         neuralNetwork.addLossLayer(new LossLayer(lossFunction));
     }
 
-    public static void loadSoftmaxCategoricalCrossEntropyLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) {
+    private static void loadSoftmaxCategoricalCrossEntropyLayer(final NeuralNetwork neuralNetwork, final BufferedReader bufferedReader) {
         neuralNetwork.addSpecialLayer(new SoftmaxCategoricalCrossEntropyLayer());
     }
 }

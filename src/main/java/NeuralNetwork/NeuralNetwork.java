@@ -172,7 +172,7 @@ public class NeuralNetwork {
         final double loss = this.getLossForPrinting();
 
         System.out.printf(
-                "accuracy: %-15s loss: %-15s",
+                "accuracy: %-15s loss: %-15s\n",
                 Helper.formatNumber(accuracy, 5),
                 Helper.formatNumber(loss, 5)
         );
