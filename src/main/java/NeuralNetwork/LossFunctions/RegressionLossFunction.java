@@ -11,12 +11,13 @@ public abstract class RegressionLossFunction implements ILossFunction {
         this.maxPercentageDifference = maxPercentageDifference;
     }
 
+    public double getMaxPercentageDifference() {
+        return this.maxPercentageDifference;
+    }
+
     @Override
     public double getAccuracyForPrinting(final Batch predictedBatch, final Batch targetBatch) {
         assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
-
-        final double targetBatchStandardDeviation = CustomMath.standardDeviation(targetBatch);
-        final double precision = targetBatchStandardDeviation / 250.0;
 
         final DataList correctPredictionsList = new DataList(predictedBatch.getRowsSize());
 

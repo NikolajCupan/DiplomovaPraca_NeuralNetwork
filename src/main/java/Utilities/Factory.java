@@ -4,13 +4,22 @@ import NeuralNetwork.ActivationFunctions.Linear;
 import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
+import NeuralNetwork.BuildingBlocks.RegularizerStruct;
 import NeuralNetwork.Layers.Common.ActivationLayer;
+import NeuralNetwork.Layers.Common.DropoutLayer;
 import NeuralNetwork.Layers.Common.HiddenLayer;
 import NeuralNetwork.Layers.Common.LossLayer;
 import NeuralNetwork.LossFunctions.MeanSquaredError;
 import NeuralNetwork.NeuralNetwork;
 import NeuralNetwork.Optimizers.AdaptiveMomentum;
 import NeuralNetwork.Optimizers.OptimizerBase;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Factory {
     public static Batch getTrainInputBatch() {
@@ -451,7 +460,7 @@ public class Factory {
         return batch;
     }
 
-    public static Batch getTargetBatch() {
+    public static Batch getTrainTargetBatch() {
         final Batch batch = new Batch();
 
         batch.addRow(new DataList(new double[]{ 0.055 }));
@@ -1119,17 +1128,86 @@ public class Factory {
         return batch;
     }
 
+    public static void fillBatch(final String path, final Batch input, final Batch target) {
+        try {
+            for (int i = 0; i <= 9; ++i) {
+                final String classPath = path + "/" + i;
+                final File directory = new File(classPath);
+                final File[] directoryListing = directory.listFiles();
+
+                for (final File file : directoryListing) {
+                    final BufferedImage image = javax.imageio.ImageIO.read(file);
+                    final Raster raster = image.getRaster();
+
+                    final DataList row = new DataList(28 * 28);
+
+                    for (int y = 0; y < 28; ++y) {
+                        for (int x = 0; x < 28; ++x) {
+                            int[] iArray = null;
+                            final int pixel = raster.getPixel(x, y, iArray)[0];
+                            final int gray = pixel & 0xFF;
+
+                            final double finalPixel = ((double)gray - 127.5) / 127.5;
+
+                            row.setValue(y * 28 + x, finalPixel);
+                        }
+                    }
+
+                    input.addRow(row);
+
+                    final DataList targetRow = new DataList(10);
+                    for (int j = 0; j <= 9; ++j) {
+                        targetRow.setValue(j, i == j ? 1.0 : 0.0);
+                    }
+                    target.addRow(targetRow);
+                }
+            }
+        } catch (final Exception ignore) {}
+    }
+
+    public static void fillBatches(final Batch trainInput, final Batch trainTarget, final Batch testInput, final Batch testTarget) {
+        Factory.fillBatch("fashion_mnist_images/test", testInput, testTarget);
+
+        final Batch trainInputTemp = new Batch();
+        final Batch trainTargetTemp = new Batch();
+        Factory.fillBatch("fashion_mnist_images/train", trainInputTemp, trainTargetTemp);
+
+
+        final List<Integer> keys = new ArrayList<>();
+        for (int i = 0; i < 60_000; ++i) {
+            keys.add(i);
+        }
+        Collections.shuffle(keys);
+
+
+        for (int i = 0; i < 60_000; ++i) {
+            final int key = keys.get(i);
+
+            final DataList inputList = trainInputTemp.getRow(key);
+            final DataList targetList = trainTargetTemp.getRow(key);
+
+            trainInput.addRow(inputList);
+            trainTarget.addRow(targetList);
+        }
+    }
+
     public static NeuralNetwork getNeuralNetwork() {
         final SeedGenerator seedGenerator = new SeedGenerator(420);
 
 
         final NeuralNetwork neuralNetwork = new NeuralNetwork(15);
+        neuralNetwork.initializeGlobalRegularizer(new RegularizerStruct(0.0, 0.005, 0.0, 0.005));
 
-        neuralNetwork.addHiddenLayer(new HiddenLayer(15, 64, seedGenerator.getSeed()));
+        final HiddenLayer hiddenLayer1 = new HiddenLayer(15, 64);
+        // hiddenLayer1.initializeRegularizer(new RegularizerStruct(0.0, 0.005, 0.0, 0.005));
+        neuralNetwork.addHiddenLayer(hiddenLayer1);
         neuralNetwork.addActivationLayer(new ActivationLayer(new RectifiedLinearUnit()));
 
-        neuralNetwork.addHiddenLayer(new HiddenLayer(64, 64, seedGenerator.getSeed()));
+        final HiddenLayer hiddenLayer2 = new HiddenLayer(64, 64);
+        // hiddenLayer2.initializeRegularizer(new RegularizerStruct(0.0, 0.004, 0.0, 0.004));
+        neuralNetwork.addHiddenLayer(hiddenLayer2);
         neuralNetwork.addActivationLayer(new ActivationLayer(new Linear()));
+        neuralNetwork.addDropoutLayer(new DropoutLayer(0.90));
 
         neuralNetwork.addHiddenLayer(new HiddenLayer(64, 1, seedGenerator.getSeed()));
         neuralNetwork.addActivationLayer(new ActivationLayer(new Linear()));

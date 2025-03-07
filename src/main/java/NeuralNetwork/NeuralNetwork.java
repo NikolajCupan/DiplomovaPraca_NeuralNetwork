@@ -31,11 +31,7 @@ public class NeuralNetwork {
         this.optimizer = Optional.empty();
     }
 
-    public void initializeGlobalRegularizer(
-            final double biasesRegularizerL1,
-            final double biasesRegularizerL2,
-            final double weightsRegularizerL1,
-            final double weightsRegularizerL2) {
+    public void initializeGlobalRegularizer(final RegularizerStruct regularizerStruct) {
         if (this.globalRegularizerStruct.isPresent()) {
             throw new RuntimeException("Global regularizer is already set in neural network");
         }
@@ -44,13 +40,19 @@ public class NeuralNetwork {
             throw new RuntimeException("Global regularizer cannot be set if layers are not empty");
         }
 
-        final RegularizerStruct regularizer = new RegularizerStruct();
-        regularizer.setBiasesRegularizerL1(biasesRegularizerL1);
-        regularizer.setBiasesRegularizerL2(biasesRegularizerL2);
-        regularizer.setWeightsRegularizerL1(weightsRegularizerL1);
-        regularizer.setWeightsRegularizerL2(weightsRegularizerL2);
+        this.globalRegularizerStruct = Optional.of(regularizerStruct);
+    }
 
-        this.globalRegularizerStruct = Optional.of(regularizer);
+    public boolean isGlobalRegularizerSet() {
+        return this.globalRegularizerStruct.isPresent();
+    }
+
+    public RegularizerStruct getGlobalRegularizer() {
+        if (this.globalRegularizerStruct.isEmpty()) {
+            throw new RuntimeException("Global regularizer is empty");
+        }
+
+        return this.globalRegularizerStruct.get();
     }
 
     private double getAccuracyForPrinting() {
@@ -118,7 +120,8 @@ public class NeuralNetwork {
 
                 this.forward(stepInputBatch, targetInputBatch, true);
 
-                if (printingStep) {
+
+                if (printingEpoch || printingStep) {
                     final double accuracy = this.getAccuracyForPrinting();
                     sumAccuracy += accuracy;
 
@@ -128,14 +131,17 @@ public class NeuralNetwork {
                     final double regularizedLoss = this.getRegularizedLossForPrinting();
                     sumRegularizedLoss += regularizedLoss;
 
-                    System.out.printf(
-                            "\n\tstep: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
-                            stepIndex + 1,
-                            Helper.formatNumber(accuracy, 5),
-                            Helper.formatNumber(loss, 5),
-                            Helper.formatNumber(regularizedLoss, 5)
-                    );
+                    if (printingStep) {
+                        System.out.printf(
+                                "\n\tstep: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
+                                stepIndex + 1,
+                                Helper.formatNumber(accuracy, 5),
+                                Helper.formatNumber(loss, 5),
+                                Helper.formatNumber(regularizedLoss, 5)
+                        );
+                    }
                 }
+
 
                 this.backward();
                 this.optimizer.get().performOptimization();
@@ -317,16 +323,6 @@ public class NeuralNetwork {
         this.optimizer = Optional.of(optimizer);
     }
 
-    private static <T extends LayerBase> T getLayerAsType(final List<LayerBase> layers, final int index, final Class<T> type) {
-        final LayerBase layer = layers.get(index);
-
-        if (type.isInstance(layer)) {
-            return type.cast(layer);
-        } else {
-            throw new IllegalArgumentException("Layer at index [" + index + "] is not of type [" + type.getName() + "]");
-        }
-    }
-
     private boolean isLastLayerSuitable() {
         if (this.layers.isEmpty()) {
             return false;
@@ -341,6 +337,16 @@ public class NeuralNetwork {
         }
 
         return false;
+    }
+
+    private static <T extends LayerBase> T getLayerAsType(final List<LayerBase> layers, final int index, final Class<T> type) {
+        final LayerBase layer = layers.get(index);
+
+        if (type.isInstance(layer)) {
+            return type.cast(layer);
+        } else {
+            throw new IllegalArgumentException("Layer at index [" + index + "] is not of type [" + type.getName() + "]");
+        }
     }
 
     public static List<Batch> prepareSteps(final Batch batch, final int stepRowsSize) {

@@ -15,6 +15,10 @@ public class ActivationLayer extends LayerBase {
         this.activationFunction = activationFunction;
     }
 
+    public IActivationFunction getActivationFunction() {
+        return this.activationFunction;
+    }
+
     @Override
     public void forward(final Batch inputBatch) {
         this.setSavedInputBatch(inputBatch);

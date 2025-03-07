@@ -30,6 +30,10 @@ public class DropoutLayer extends LayerBase {
         this.random = new Random(seed);
     }
 
+    public double getKeepRate() {
+        return this.keepRate;
+    }
+
     public Batch getKeepMaskBatch() {
         if (this.keepMaskBatch.isEmpty()) {
             throw new IllegalArgumentException("Dropout layer saved keep mask batch is empty");

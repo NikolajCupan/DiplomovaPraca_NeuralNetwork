@@ -81,6 +81,14 @@ public class HiddenLayer extends LayerBase {
         return this.regularizerStruct.isPresent();
     }
 
+    public RegularizerStruct getRegularizer() {
+        if (this.regularizerStruct.isEmpty()) {
+            throw new RuntimeException("Regularizer is empty");
+        }
+
+        return this.regularizerStruct.get();
+    }
+
     public List<Neuron> getNeurons() {
         return this.neurons;
     }
