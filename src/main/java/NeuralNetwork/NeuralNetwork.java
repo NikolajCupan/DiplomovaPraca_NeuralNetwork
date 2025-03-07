@@ -89,39 +89,72 @@ public class NeuralNetwork {
         return this.layers;
     }
 
-    public void train(final Batch inputBatch, final Batch targetBatch, final int epochsSize, final int printStep) {
+    public void train(final Batch inputBatch, final Batch targetBatch, final int epochsSize, final int stepRowsSize, final int epochPrintEvery, final int stepPrintEvery) {
         if (!this.isLastLayerSuitable()) {
             throw new RuntimeException("Cannot perform forward method, last layer is not suitable");
         } else if (this.optimizer.isEmpty()) {
             throw new RuntimeException("Cannot perform training, optimizer is empty");
         }
 
+        final List<Batch> inputBatchSteps = NeuralNetwork.prepareSteps(inputBatch, stepRowsSize);
+        final List<Batch> targetBatchSteps = NeuralNetwork.prepareSteps(targetBatch, stepRowsSize);
+
         for (int epoch = 1; epoch < epochsSize + 1; ++epoch) {
-            boolean printing = (epoch % printStep == 0);
-
-            this.forward(inputBatch, targetBatch, true);
-
-            if (printing) {
-                final double accuracy = this.getAccuracyForPrinting();
-                final double loss = this.getLossForPrinting();
-                final double regularizedLoss = this.getRegularizedLossForPrinting();
-
-                System.out.printf(
-                        "epoch: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
-                        epoch,
-                        Helper.formatNumber(accuracy, 5),
-                        Helper.formatNumber(loss, 5),
-                        Helper.formatNumber(regularizedLoss, 5)
-                );
+            final boolean printingEpoch = (epoch % epochPrintEvery == 0);
+            if (printingEpoch) {
+                System.out.print("[EPOCH " + epoch + "]");
             }
 
-            this.backward();
-            this.optimizer.get().performOptimization();
-            this.clearState();
+            double sumAccuracy = 0.0;
+            double sumLoss = 0.0;
+            double sumRegularizedLoss = 0.0;
 
-            if (printing) {
-                final double learningRate = this.optimizer.get().getCurrentLearningRate();
-                System.out.printf("%-15s%n", "lr: " + learningRate);
+
+            for (int stepIndex = 0; stepIndex < inputBatchSteps.size(); ++stepIndex) {
+                final boolean printingStep = ((stepIndex + 1) % stepPrintEvery == 0);
+
+                final Batch stepInputBatch = inputBatchSteps.get(stepIndex);
+                final Batch targetInputBatch = targetBatchSteps.get(stepIndex);
+
+                this.forward(stepInputBatch, targetInputBatch, true);
+
+                if (printingStep) {
+                    final double accuracy = this.getAccuracyForPrinting();
+                    sumAccuracy += accuracy;
+
+                    final double loss = this.getLossForPrinting();
+                    sumLoss += loss;
+
+                    final double regularizedLoss = this.getRegularizedLossForPrinting();
+                    sumRegularizedLoss += regularizedLoss;
+
+                    System.out.printf(
+                            "\n\tstep: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
+                            stepIndex + 1,
+                            Helper.formatNumber(accuracy, 5),
+                            Helper.formatNumber(loss, 5),
+                            Helper.formatNumber(regularizedLoss, 5)
+                    );
+                }
+
+                this.backward();
+                this.optimizer.get().performOptimization();
+                this.clearState();
+
+                if (printingStep) {
+                    final double learningRate = this.optimizer.get().getCurrentLearningRate();
+                    System.out.printf("%-15s", "lr: " + learningRate);
+                }
+            }
+
+            if (printingEpoch) {
+                System.out.printf(
+                        "\n\taverage %-13s accuracy: %-15s loss: %-15s regularized loss: %-15s\n",
+                        "",
+                        Helper.formatNumber(sumAccuracy / inputBatchSteps.size(), 5),
+                        Helper.formatNumber(sumLoss / inputBatchSteps.size(), 5),
+                        Helper.formatNumber(sumRegularizedLoss/ inputBatchSteps.size(), 5)
+                );
             }
         }
     }
@@ -308,5 +341,31 @@ public class NeuralNetwork {
         }
 
         return false;
+    }
+
+    public static List<Batch> prepareSteps(final Batch batch, final int stepRowsSize) {
+        if (batch.getRowsSize() <= stepRowsSize) {
+            // Single batch consisting of all rows
+            final List<Batch> batchSteps = new ArrayList<>();
+            batchSteps.add(batch);
+            return batchSteps;
+        }
+
+        final int batchRowsSize = batch.getRowsSize();
+        final int stepsSize = batchRowsSize / stepRowsSize;
+
+        final List<Batch> batchSteps = new ArrayList<>();
+        for (int i = 0; i < stepsSize; ++i) {
+            batchSteps.add(new Batch());
+        }
+
+        for (int rowIndex = 0; rowIndex < batchRowsSize; ++rowIndex) {
+            final int batchStepIndex = rowIndex / stepRowsSize;
+
+            final Batch batchStep = batchSteps.get(Math.min(batchStepIndex, stepsSize - 1));
+            batchStep.addRow(batch.getRow(rowIndex));
+        }
+
+        return batchSteps;
     }
 }
