@@ -4,7 +4,11 @@ import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import Utilities.CustomMath;
 
-public class MeanAbsoluteError implements IRegressionLossFunction {
+public class MeanAbsoluteError extends RegressionLossFunction {
+    public MeanAbsoluteError(final double maxPercentageDifference) {
+        super(maxPercentageDifference);
+    }
+
     @Override
     public Batch backward(final Batch inputBatch, final Batch targetBatch) {
         final int inputBatchRowsSize = inputBatch.getRowsSize();

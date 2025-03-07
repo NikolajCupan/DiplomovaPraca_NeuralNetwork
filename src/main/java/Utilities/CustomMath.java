@@ -171,4 +171,16 @@ public class CustomMath {
 
         return matrix;
     }
+
+    // | left - right |
+    // ---------------- * 100
+    // ( left - right )
+    // ( ------------ )
+    // (      2       )
+    public static double percentualDifference(final double left, final double right) {
+        final double numerator = Math.abs(left - right);
+        final double denominator= (left + right) / 2.0;
+
+        return (numerator / denominator) * 100.0;
+    }
 }

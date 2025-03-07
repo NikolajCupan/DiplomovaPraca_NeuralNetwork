@@ -1134,7 +1134,7 @@ public class Factory {
         neuralNetwork.addHiddenLayer(new HiddenLayer(64, 1, seedGenerator.getSeed()));
         neuralNetwork.addActivationLayer(new ActivationLayer(new Linear()));
 
-        neuralNetwork.addLossLayer(new LossLayer(new MeanSquaredError()));
+        neuralNetwork.addLossLayer(new LossLayer(new MeanSquaredError(5.0)));
 
 
         final OptimizerBase optimizer =

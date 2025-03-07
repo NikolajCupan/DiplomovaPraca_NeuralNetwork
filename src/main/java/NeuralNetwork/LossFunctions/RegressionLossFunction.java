@@ -4,9 +4,15 @@ import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import Utilities.CustomMath;
 
-public interface IRegressionLossFunction extends ILossFunction {
+public abstract class RegressionLossFunction implements ILossFunction {
+    private final double maxPercentageDifference;
+
+    protected RegressionLossFunction(final double maxPercentageDifference) {
+        this.maxPercentageDifference = maxPercentageDifference;
+    }
+
     @Override
-    default double getAccuracyForPrinting(final Batch predictedBatch, final Batch targetBatch) {
+    public double getAccuracyForPrinting(final Batch predictedBatch, final Batch targetBatch) {
         assert(predictedBatch.getRowsSize() == targetBatch.getRowsSize());
 
         final double targetBatchStandardDeviation = CustomMath.standardDeviation(targetBatch);
@@ -24,7 +30,9 @@ public interface IRegressionLossFunction extends ILossFunction {
                 final double prediction = predictedRow.getValue(i);
                 final double target = targetRow.getValue(i);
 
-                if (Math.abs(prediction - target) < precision) {
+                final double percentualDifference = CustomMath.percentualDifference(prediction, target);
+
+                if (percentualDifference <= this.maxPercentageDifference) {
                     correctPredictions += 1.0;
                 }
             }
@@ -34,7 +42,4 @@ public interface IRegressionLossFunction extends ILossFunction {
 
         return CustomMath.mean(correctPredictionsList);
     }
-
-    @Override
-    double loss(final DataList predictedRow, final DataList targetRow);
 }
