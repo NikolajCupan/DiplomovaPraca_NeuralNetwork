@@ -1,5 +1,6 @@
 import GUI.GUI;
 import NeuralNetwork.BuildingBlocks.Batch;
+import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.NeuralNetwork;
 import Utilities.Factory;
 
@@ -44,7 +45,7 @@ public class Main {
 
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork3();
-        neuralNetwork.train(trainInput, trainTarget, 1000, Integer.MAX_VALUE, 100, Integer.MAX_VALUE);
+        neuralNetwork.train(trainInput, trainTarget, 250, Integer.MAX_VALUE, 100, Integer.MAX_VALUE);
 
 
         neuralNetwork.test(testInput, testTarget);
@@ -61,16 +62,23 @@ public class Main {
 
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork4();
-        neuralNetwork.train(trainInput, trainTarget, 1000, Integer.MAX_VALUE, 100, Integer.MAX_VALUE);
-        neuralNetwork.test(testInput, testTarget);
+        neuralNetwork.train(trainInput, trainTarget, 25000, Integer.MAX_VALUE, 250, Integer.MAX_VALUE);
+
+        final Batch predictedTrain = neuralNetwork.predict(trainInput);
+        final Batch predictedTest = neuralNetwork.predict(testInput);
 
 
-        final Batch predicted = neuralNetwork.getPredictedBatch();
+        final DataList forecast = neuralNetwork.forecast(testInput.getRow(testInput.getRowsSize() - 1), 100);
+
+
+
         final GUI gui = new GUI();
-
         gui.show(Arrays.asList(
-                new GUI.ChartData(testTarget.getColumn(0), "target", 0),
-                new GUI.ChartData(predicted.getColumn(0), "predicted", 0)
+                new GUI.ChartData(trainTarget.getColumn(0), "train_target", "blue", 0),
+                new GUI.ChartData(testTarget.getColumn(0), "test_target", "cyan", trainTarget.getRowsSize() - 1),
+                new GUI.ChartData(predictedTrain.getColumn(0), "predicted_train", "orange", 0),
+                new GUI.ChartData(predictedTest.getColumn(0), "predicted_test", "red", trainTarget.getRowsSize() - 1),
+                new GUI.ChartData(forecast, "forecast", "green", testTarget.getRowsSize() + trainTarget.getRowsSize() - 1)
         ));
     }
 

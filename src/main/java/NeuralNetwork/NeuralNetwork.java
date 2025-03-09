@@ -12,9 +12,7 @@ import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
 import NeuralNetwork.Optimizers.OptimizerBase;
 import Utilities.Helper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class NeuralNetwork {
     private final int inputSize;
@@ -192,35 +190,6 @@ public class NeuralNetwork {
         );
     }
 
-    public Batch predict(final Batch inputBatch) {
-        this.clearState();
-
-        final List<LayerBase> usedLayers = new ArrayList<>();
-        for (final LayerBase layer : this.layers) {
-            if (layer instanceof final SoftmaxCategoricalCrossEntropyLayer softmaxCCELayer) {
-                usedLayers.add(softmaxCCELayer.getActivationLayer());
-            } else if (!(layer instanceof DropoutLayer) && !(layer instanceof LossLayer)) {
-                usedLayers.add(layer);
-            }
-        }
-
-
-        final HiddenLayer firstLayer = NeuralNetwork.getLayerAsType(usedLayers, 0, HiddenLayer.class);
-        firstLayer.forward(inputBatch);
-
-        for (int i = 1; i < usedLayers.size(); ++i) {
-            final LayerBase previousLayer = usedLayers.get(i - 1);
-            final LayerBase currentLayer = usedLayers.get(i);
-
-            currentLayer.forward(previousLayer.getSavedOutputBatch());
-        }
-
-        final Batch predictedBatch = usedLayers.getLast().getSavedOutputBatch();
-        this.clearState();
-
-        return predictedBatch;
-    }
-
     private void forward(final Batch inputBatch, final Batch targetBatch, final boolean includeDropoutLayers) {
         final List<LayerBase> usedLayers = new ArrayList<>();
         for (final LayerBase layer : this.layers) {
@@ -232,15 +201,80 @@ public class NeuralNetwork {
         final LayerBase lastLayer = usedLayers.getLast();
         lastLayer.setSavedTargetBatch(targetBatch);
 
-        final HiddenLayer firstLayer = NeuralNetwork.getLayerAsType(usedLayers, 0, HiddenLayer.class);
+        NeuralNetwork.forwardLayers(inputBatch, usedLayers);
+    }
+
+    public Batch predict(final Batch inputBatch) {
+        this.clearState();
+
+        final List<LayerBase> usedLayers = NeuralNetwork.filterLayersForPrediction(this.layers);
+        NeuralNetwork.forwardLayers(inputBatch, usedLayers);
+
+        final Batch predictedBatch = usedLayers.getLast().getSavedOutputBatch();
+        this.clearState();
+
+        return predictedBatch;
+    }
+
+    public DataList forecast(final DataList startList, final int forecastsSize) {
+        this.clearState();
+
+        final List<LayerBase> usedLayers = NeuralNetwork.filterLayersForPrediction(this.layers);
+        final DataList predictions = new DataList(forecastsSize);
+
+        final DataList currentList = new DataList(startList.getDataListSize());
+        for (int i = 0; i < currentList.getDataListSize(); ++i) {
+            currentList.setValue(i, startList.getValue(i));
+        }
+
+        for (int i = 0; i < forecastsSize; ++i) {
+            final Batch batch = new Batch();
+            batch.addRow(currentList);
+
+
+            NeuralNetwork.forwardLayers(batch, usedLayers);
+            final double predictedValue = usedLayers.getLast().getSavedInputBatch().getRow(0).getValue(0);
+            predictions.setValue(i, predictedValue);
+
+
+            for (int j = 0; j < currentList.getDataListSize() - 1; ++j) {
+                currentList.setValue(
+                        j,
+                        currentList.getValue(j + 1)
+                );
+            }
+            currentList.setValue(currentList.getDataListSize() - 1, predictedValue);
+
+            this.clearState();
+        }
+
+        return predictions;
+    }
+
+    private static void forwardLayers(final Batch inputBatch, final List<LayerBase> layers) {
+        final HiddenLayer firstLayer = NeuralNetwork.getLayerAsType(layers, 0, HiddenLayer.class);
         firstLayer.forward(inputBatch);
 
-        for (int i = 1; i < usedLayers.size(); ++i) {
-            final LayerBase previousLayer = usedLayers.get(i - 1);
-            final LayerBase currentLayer = usedLayers.get(i);
+        for (int i = 1; i < layers.size(); ++i) {
+            final LayerBase previousLayer = layers.get(i - 1);
+            final LayerBase currentLayer = layers.get(i);
 
             currentLayer.forward(previousLayer.getSavedOutputBatch());
         }
+    }
+
+    private static List<LayerBase> filterLayersForPrediction(final List<LayerBase> layers) {
+        final List<LayerBase> filteredLayers = new ArrayList<>();
+
+        for (final LayerBase layer : layers) {
+            if (layer instanceof final SoftmaxCategoricalCrossEntropyLayer softmaxCCELayer) {
+                filteredLayers.add(softmaxCCELayer.getActivationLayer());
+            } else if (!(layer instanceof DropoutLayer) && !(layer instanceof LossLayer)) {
+                filteredLayers.add(layer);
+            }
+        }
+
+        return filteredLayers;
     }
 
     private void backward() {
@@ -392,7 +426,7 @@ public class NeuralNetwork {
         }
     }
 
-    public static List<Batch> prepareSteps(final Batch batch, final int stepRowsSize) {
+    private static List<Batch> prepareSteps(final Batch batch, final int stepRowsSize) {
         if (batch.getRowsSize() <= stepRowsSize) {
             // Single batch consisting of all rows
             final List<Batch> batchSteps = new ArrayList<>();
