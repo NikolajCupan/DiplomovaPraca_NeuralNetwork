@@ -62,7 +62,7 @@ public class Main {
 
 
         final NeuralNetwork neuralNetwork = Factory.getNeuralNetwork4();
-        neuralNetwork.train(trainInput, trainTarget, 25000, Integer.MAX_VALUE, 250, Integer.MAX_VALUE);
+        neuralNetwork.train(trainInput, trainTarget, 1000, Integer.MAX_VALUE, 100, Integer.MAX_VALUE);
 
         final Batch predictedTrain = neuralNetwork.predict(trainInput);
         final Batch predictedTest = neuralNetwork.predict(testInput);

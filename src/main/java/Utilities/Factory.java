@@ -1,7 +1,9 @@
 package Utilities;
 
+import NeuralNetwork.ActivationFunctions.LeakyRectifiedLinearUnit;
 import NeuralNetwork.ActivationFunctions.Linear;
 import NeuralNetwork.ActivationFunctions.RectifiedLinearUnit;
+import NeuralNetwork.ActivationFunctions.Tanh;
 import NeuralNetwork.BuildingBlocks.Batch;
 import NeuralNetwork.BuildingBlocks.DataList;
 import NeuralNetwork.Layers.Common.ActivationLayer;
@@ -3589,15 +3591,15 @@ public class Factory {
         final NeuralNetwork neuralNetwork = new NeuralNetwork(15);
 
         neuralNetwork.addHiddenLayer(new HiddenLayer(15, 64));
-        neuralNetwork.addActivationLayer(new ActivationLayer(new RectifiedLinearUnit()));
+        neuralNetwork.addActivationLayer(new ActivationLayer(new LeakyRectifiedLinearUnit(0.01)));
 
         neuralNetwork.addHiddenLayer(new HiddenLayer(64, 64));
-        neuralNetwork.addActivationLayer(new ActivationLayer(new Linear()));
+        neuralNetwork.addActivationLayer(new ActivationLayer(new Tanh()));
 
         neuralNetwork.addHiddenLayer(new HiddenLayer(64, 1));
         neuralNetwork.addActivationLayer(new ActivationLayer(new Linear()));
 
-        neuralNetwork.addLossLayer(new LossLayer(new MeanSquaredError(5.0)));
+        neuralNetwork.addLossLayer(new LossLayer(new MeanSquaredError(0.05)));
 
 
 

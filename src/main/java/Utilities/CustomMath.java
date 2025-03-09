@@ -173,7 +173,7 @@ public class CustomMath {
     }
 
     // | left - right |
-    // ---------------- * 100
+    // ----------------
     // ( left - right )
     // ( ------------ )
     // (      2       )
@@ -181,6 +181,6 @@ public class CustomMath {
         final double numerator = Math.abs(left - right);
         final double denominator= (left + right) / 2.0;
 
-        return (numerator / denominator) * 100.0;
+        return numerator / denominator;
     }
 }
