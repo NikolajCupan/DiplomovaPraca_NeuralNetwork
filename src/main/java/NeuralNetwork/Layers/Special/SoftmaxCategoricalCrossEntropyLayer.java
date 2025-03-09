@@ -24,6 +24,14 @@ public class SoftmaxCategoricalCrossEntropyLayer extends LayerBase implements IA
         this.categoricalCrossEntropyLossLayer = new LossLayer(new CategoricalCrossEntropy());
     }
 
+    public ActivationLayer getActivationLayer() {
+        return this.softmaxActivationLayer;
+    }
+
+    public LossLayer getLossLayer() {
+        return this.categoricalCrossEntropyLossLayer;
+    }
+
     @Override
     public double getAccuracyForPrinting() {
         return this.categoricalCrossEntropyLossLayer.getAccuracyForPrinting();
