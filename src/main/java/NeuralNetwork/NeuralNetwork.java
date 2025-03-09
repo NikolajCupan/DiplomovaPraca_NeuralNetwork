@@ -121,6 +121,7 @@ public class NeuralNetwork {
             double sumAccuracy = 0.0;
             double sumLoss = 0.0;
             double sumRegularizedLoss = 0.0;
+            double sumLearningRate = 0.0;
 
 
             for (int stepIndex = 0; stepIndex < inputBatchSteps.size(); ++stepIndex) {
@@ -142,9 +143,9 @@ public class NeuralNetwork {
                     final double regularizedLoss = this.getRegularizedLossForPrinting();
                     sumRegularizedLoss += regularizedLoss;
 
-                    if (printingStep) {
+                    if (printingEpoch && printingStep) {
                         System.out.printf(
-                                "\n\tstep: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s",
+                                "\n\tstep: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s ",
                                 stepIndex + 1,
                                 Helper.formatNumber(accuracy, 5),
                                 Helper.formatNumber(loss, 5),
@@ -158,19 +159,25 @@ public class NeuralNetwork {
                 this.optimizer.get().performOptimization();
                 this.clearState();
 
-                if (printingStep) {
+
+                if (printingEpoch || printingStep) {
                     final double learningRate = this.optimizer.get().getCurrentLearningRate();
-                    System.out.printf("%-15s", "lr: " + learningRate);
+                    sumLearningRate += learningRate;
+
+                    if (printingEpoch && printingStep) {
+                        System.out.printf("%-15s", "lr: " + learningRate);
+                    }
                 }
             }
 
             if (printingEpoch) {
                 System.out.printf(
-                        "\n\taverage %-13s accuracy: %-15s loss: %-15s regularized loss: %-15s\n",
+                        "\n\taverage %-13s accuracy: %-15s loss: %-15s regularized loss: %-15s lr: %-15s\n",
                         "",
                         Helper.formatNumber(sumAccuracy / inputBatchSteps.size(), 5),
                         Helper.formatNumber(sumLoss / inputBatchSteps.size(), 5),
-                        Helper.formatNumber(sumRegularizedLoss/ inputBatchSteps.size(), 5)
+                        Helper.formatNumber(sumRegularizedLoss/ inputBatchSteps.size(), 5),
+                        Helper.formatNumber(sumLearningRate / inputBatchSteps.size(), 5)
                 );
             }
         }
