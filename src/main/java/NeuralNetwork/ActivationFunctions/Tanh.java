@@ -2,7 +2,7 @@ package NeuralNetwork.ActivationFunctions;
 
 import NeuralNetwork.BuildingBlocks.DataList;
 
-public class RectifiedLinearUnit implements IActivationFunction {
+public class Tanh implements IActivationFunction {
     @Override
     public DataList activate(final DataList inputList) {
         final DataList outputList = new DataList(inputList.getDataListSize());
@@ -10,7 +10,7 @@ public class RectifiedLinearUnit implements IActivationFunction {
         for (int i = 0; i < inputList.getDataListSize(); ++i) {
             outputList.setValue(
                     i,
-                    Math.max(0.0, inputList.getValue(i))
+                    Math.tanh(inputList.getValue(i))
             );
         }
 
@@ -19,11 +19,15 @@ public class RectifiedLinearUnit implements IActivationFunction {
 
     @Override
     public double derivative(final double input) {
-        return input < 0.0 ? 0.0 : 1.0;
+        final DataList inputWrapper = new DataList(1);
+        inputWrapper.setValue(0, input);
+        final double output = this.activate(inputWrapper).getValue(0);
+
+        return 1.0 - Math.pow(output, 2.0);
     }
 
     @Override
     public String toString() {
-        return "Rectified linear unit";
+        return "Tanh";
     }
 }
