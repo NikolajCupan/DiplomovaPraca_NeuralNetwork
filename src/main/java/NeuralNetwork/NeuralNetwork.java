@@ -108,7 +108,14 @@ public class NeuralNetwork {
         return this.layers;
     }
 
+    public void stopTraining() {
+        this.outputStream.println("Stop of training requested, stopping training");
+        this.stopTraining = true;
+    }
+
     public void train(final Batch inputBatch, final Batch targetBatch, final int epochsSize, final int stepRowsSize, final int epochPrintEvery, final int stepPrintEvery, final int timeLimitMs) {
+        this.stopTraining = false;
+
         try {
             final Thread trainingThread = new Thread(
                     () -> this.train(inputBatch, targetBatch, epochsSize, stepRowsSize, epochPrintEvery, stepPrintEvery)
@@ -119,6 +126,8 @@ public class NeuralNetwork {
             while (trainingThread.isAlive()) {
                 final long elapsedTime = System.currentTimeMillis() - startTime;
                 if (elapsedTime > timeLimitMs) {
+                    this.outputStream.println("Time limit sent to train method elapsed, stopping training");
+
                     this.stopTraining = true;
                     break;
                 }
