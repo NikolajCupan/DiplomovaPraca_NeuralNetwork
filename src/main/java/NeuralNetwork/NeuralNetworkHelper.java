@@ -178,7 +178,7 @@ public class NeuralNetworkHelper {
 
             String line = bufferedReader.readLine();
             final int inputsSize = Integer.parseInt(line);
-            final NeuralNetwork neuralNetwork = new NeuralNetwork(inputsSize);
+            final NeuralNetwork neuralNetwork = new NeuralNetwork(inputsSize, System.out);
 
             while ((line = bufferedReader.readLine()) != null) {
                 switch (line) {

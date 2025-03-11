@@ -12,10 +12,12 @@ import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
 import NeuralNetwork.Optimizers.OptimizerBase;
 import Utilities.Helper;
 
+import java.io.PrintStream;
 import java.util.*;
 
 public class NeuralNetwork {
     private volatile boolean stopTraining;
+    private final PrintStream outputStream;
 
     private final int inputSize;
     private final List<LayerBase> layers;
@@ -23,8 +25,9 @@ public class NeuralNetwork {
     private Optional<RegularizerStruct> globalRegularizerStruct;
     private Optional<OptimizerBase> optimizer;
 
-    public NeuralNetwork(final int inputSize) {
+    public NeuralNetwork(final int inputSize, final PrintStream outputStream) {
         this.stopTraining = false;
+        this.outputStream = outputStream;
 
         this.inputSize = inputSize;
         this.layers = new ArrayList<>();
@@ -105,8 +108,29 @@ public class NeuralNetwork {
         return this.layers;
     }
 
-    public void stopTraining() {
-        this.stopTraining = true;
+    public void train(final Batch inputBatch, final Batch targetBatch, final int epochsSize, final int stepRowsSize, final int epochPrintEvery, final int stepPrintEvery, final int timeLimitMs) {
+        try {
+            final Thread trainingThread = new Thread(
+                    () -> this.train(inputBatch, targetBatch, epochsSize, stepRowsSize, epochPrintEvery, stepPrintEvery)
+            );
+            trainingThread.start();
+
+            final long startTime = System.currentTimeMillis();
+            while (trainingThread.isAlive()) {
+                final long elapsedTime = System.currentTimeMillis() - startTime;
+                if (elapsedTime > timeLimitMs) {
+                    this.stopTraining = true;
+                    break;
+                }
+
+                Thread.sleep(500);
+            }
+
+            trainingThread.join();
+        } catch (final Exception ignore) {
+        }
+
+        this.stopTraining = false;
     }
 
     public void train(final Batch inputBatch, final Batch targetBatch, final int epochsSize, final int stepRowsSize, final int epochPrintEvery, final int stepPrintEvery) {
@@ -116,22 +140,20 @@ public class NeuralNetwork {
             throw new RuntimeException("Cannot perform training, optimizer is empty");
         }
 
-        this.stopTraining = false;
         this.clearState();
-
         final List<Batch> inputBatchSteps = NeuralNetwork.prepareSteps(inputBatch, stepRowsSize);
         final List<Batch> targetBatchSteps = NeuralNetwork.prepareSteps(targetBatch, stepRowsSize);
 
         for (int epoch = 1; epoch < epochsSize + 1; ++epoch) {
             if (this.stopTraining) {
-                System.out.println("Training stopped at epoch: " + epoch);
+                this.outputStream.println("Training stopped at epoch: " + epoch);
                 break;
             }
 
 
             final boolean printingEpoch = (epoch % epochPrintEvery == 0);
             if (printingEpoch) {
-                System.out.print("[EPOCH " + epoch + "]");
+                this.outputStream.print("[EPOCH " + epoch + "]");
             }
 
             double sumAccuracy = 0.0;
@@ -160,7 +182,7 @@ public class NeuralNetwork {
                     sumRegularizedLoss += regularizedLoss;
 
                     if (printingEpoch && printingStep) {
-                        System.out.printf(
+                        this.outputStream.printf(
                                 "\n\tstep: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s ",
                                 stepIndex + 1,
                                 Helper.formatNumber(accuracy, 5),
@@ -181,13 +203,13 @@ public class NeuralNetwork {
                     sumLearningRate += learningRate;
 
                     if (printingEpoch && printingStep) {
-                        System.out.printf("%-15s", "lr: " + Helper.formatNumber(learningRate, 5));
+                        this.outputStream.printf("%-15s", "lr: " + Helper.formatNumber(learningRate, 5));
                     }
                 }
             }
 
             if (printingEpoch) {
-                System.out.printf(
+                this.outputStream.printf(
                         "\n\taverage %-13s accuracy: %-15s loss: %-15s regularized loss: %-15s lr: %-15s\n",
                         "",
                         Helper.formatNumber(sumAccuracy / inputBatchSteps.size(), 5),
