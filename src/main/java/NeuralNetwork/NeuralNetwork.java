@@ -15,6 +15,8 @@ import Utilities.Helper;
 import java.util.*;
 
 public class NeuralNetwork {
+    private volatile boolean stopTraining;
+
     private final int inputSize;
     private final List<LayerBase> layers;
 
@@ -22,6 +24,8 @@ public class NeuralNetwork {
     private Optional<OptimizerBase> optimizer;
 
     public NeuralNetwork(final int inputSize) {
+        this.stopTraining = false;
+
         this.inputSize = inputSize;
         this.layers = new ArrayList<>();
 
@@ -101,6 +105,10 @@ public class NeuralNetwork {
         return this.layers;
     }
 
+    public void stopTraining() {
+        this.stopTraining = true;
+    }
+
     public void train(final Batch inputBatch, final Batch targetBatch, final int epochsSize, final int stepRowsSize, final int epochPrintEvery, final int stepPrintEvery) {
         if (!this.isLastLayerSuitable()) {
             throw new RuntimeException("Cannot perform forward method, last layer is not suitable");
@@ -108,11 +116,19 @@ public class NeuralNetwork {
             throw new RuntimeException("Cannot perform training, optimizer is empty");
         }
 
+        this.stopTraining = false;
         this.clearState();
+
         final List<Batch> inputBatchSteps = NeuralNetwork.prepareSteps(inputBatch, stepRowsSize);
         final List<Batch> targetBatchSteps = NeuralNetwork.prepareSteps(targetBatch, stepRowsSize);
 
         for (int epoch = 1; epoch < epochsSize + 1; ++epoch) {
+            if (this.stopTraining) {
+                System.out.println("Training stopped at epoch: " + epoch);
+                break;
+            }
+
+
             final boolean printingEpoch = (epoch % epochPrintEvery == 0);
             if (printingEpoch) {
                 System.out.print("[EPOCH " + epoch + "]");
@@ -165,7 +181,7 @@ public class NeuralNetwork {
                     sumLearningRate += learningRate;
 
                     if (printingEpoch && printingStep) {
-                        System.out.printf("%-15s", "lr: " + learningRate);
+                        System.out.printf("%-15s", "lr: " + Helper.formatNumber(learningRate, 5));
                     }
                 }
             }
@@ -181,6 +197,8 @@ public class NeuralNetwork {
                 );
             }
         }
+
+        this.clearState();
     }
 
     public void test(final Batch inputBatch, final Batch targetBatch) {
