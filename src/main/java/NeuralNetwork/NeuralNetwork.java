@@ -10,7 +10,7 @@ import NeuralNetwork.Layers.ILossForPrintingGetter;
 import NeuralNetwork.Layers.LayerBase;
 import NeuralNetwork.Layers.Special.SoftmaxCategoricalCrossEntropyLayer;
 import NeuralNetwork.Optimizers.OptimizerBase;
-import Utilities.Helper;
+import org.json.JSONObject;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -109,7 +109,7 @@ public class NeuralNetwork {
     }
 
     public void stopTraining() {
-        this.outputStream.println("Stop of training requested, stopping training");
+        this.outputStream.println(new JSONObject().put("message", "Stop of training requested, stopping training"));
         this.stopTraining = true;
     }
 
@@ -126,7 +126,7 @@ public class NeuralNetwork {
             while (trainingThread.isAlive()) {
                 final long elapsedTime = System.currentTimeMillis() - startTime;
                 if (elapsedTime > timeLimitMs) {
-                    this.outputStream.println("Time limit sent to train method elapsed, stopping training");
+                    this.outputStream.println(new JSONObject().put("message", "Time limit sent to train method elapsed, stopping training"));
 
                     this.stopTraining = true;
                     break;
@@ -155,15 +155,12 @@ public class NeuralNetwork {
 
         for (int epoch = 1; epoch < epochsSize + 1; ++epoch) {
             if (this.stopTraining) {
-                this.outputStream.println("Training stopped at epoch: " + epoch);
+                this.outputStream.println(new JSONObject().put("message", "Training stopped at epoch: " + epoch));
                 break;
             }
 
 
             final boolean printingEpoch = (epoch % epochPrintEvery == 0);
-            if (printingEpoch) {
-                this.outputStream.print("[EPOCH " + epoch + "]");
-            }
 
             double sumAccuracy = 0.0;
             double sumLoss = 0.0;
@@ -173,6 +170,7 @@ public class NeuralNetwork {
 
             for (int stepIndex = 0; stepIndex < inputBatchSteps.size(); ++stepIndex) {
                 final boolean printingStep = ((stepIndex + 1) % stepPrintEvery == 0);
+                final JSONObject stepJson = new JSONObject();
 
                 final Batch stepInputBatch = inputBatchSteps.get(stepIndex);
                 final Batch targetInputBatch = targetBatchSteps.get(stepIndex);
@@ -191,13 +189,11 @@ public class NeuralNetwork {
                     sumRegularizedLoss += regularizedLoss;
 
                     if (printingEpoch && printingStep) {
-                        this.outputStream.printf(
-                                "\n\tstep: %-15d accuracy: %-15s loss: %-15s regularized loss: %-15s ",
-                                stepIndex + 1,
-                                Helper.formatNumber(accuracy, 5),
-                                Helper.formatNumber(loss, 5),
-                                Helper.formatNumber(regularizedLoss, 5)
-                        );
+                        stepJson.put("epoch", epoch);
+                        stepJson.put("step", stepIndex);
+                        stepJson.put("step_accuracy", accuracy);
+                        stepJson.put("step_loss", loss);
+                        stepJson.put("step_regularized_loss", regularizedLoss);
                     }
                 }
 
@@ -212,20 +208,20 @@ public class NeuralNetwork {
                     sumLearningRate += learningRate;
 
                     if (printingEpoch && printingStep) {
-                        this.outputStream.printf("%-15s", "lr: " + Helper.formatNumber(learningRate, 5));
+                        stepJson.put("learning_rate", learningRate);
+                        this.outputStream.println(stepJson);
                     }
                 }
             }
 
             if (printingEpoch) {
-                this.outputStream.printf(
-                        "\n\taverage %-13s accuracy: %-15s loss: %-15s regularized loss: %-15s lr: %-15s\n",
-                        "",
-                        Helper.formatNumber(sumAccuracy / inputBatchSteps.size(), 5),
-                        Helper.formatNumber(sumLoss / inputBatchSteps.size(), 5),
-                        Helper.formatNumber(sumRegularizedLoss/ inputBatchSteps.size(), 5),
-                        Helper.formatNumber(sumLearningRate / inputBatchSteps.size(), 5)
-                );
+                final JSONObject epochJson = new JSONObject();
+                epochJson.put("epoch", epoch);
+                epochJson.put("accuracy", sumAccuracy / inputBatchSteps.size());
+                epochJson.put("loss", sumLoss / inputBatchSteps.size());
+                epochJson.put("regularized_loss", sumRegularizedLoss / inputBatchSteps.size());
+                epochJson.put("learning_rate", sumLearningRate / inputBatchSteps.size());
+                this.outputStream.println(epochJson);
             }
         }
 
@@ -239,11 +235,10 @@ public class NeuralNetwork {
         final double accuracy = this.getAccuracyForPrinting();
         final double loss = this.getLossForPrinting();
 
-        System.out.printf(
-                "accuracy: %-15s loss: %-15s\n",
-                Helper.formatNumber(accuracy, 5),
-                Helper.formatNumber(loss, 5)
-        );
+        final JSONObject json = new JSONObject();
+        json.put("accuracy", accuracy);
+        json.put("loss", loss);
+        this.outputStream.println(json);
     }
 
     private void forward(final Batch inputBatch, final Batch targetBatch, final boolean includeDropoutLayers) {
