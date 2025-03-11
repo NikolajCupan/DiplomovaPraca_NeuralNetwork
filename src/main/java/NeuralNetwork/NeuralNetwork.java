@@ -109,7 +109,11 @@ public class NeuralNetwork {
     }
 
     public void stopTraining() {
-        this.outputStream.println(new JSONObject().put("message", "Stop of training requested, stopping training"));
+        final JSONObject json = new JSONObject();
+        json.put("action", "training_stopped");
+        json.put("reason", "requested");
+        this.outputStream.println(json);
+
         this.stopTraining = true;
     }
 
@@ -126,7 +130,10 @@ public class NeuralNetwork {
             while (trainingThread.isAlive()) {
                 final long elapsedTime = System.currentTimeMillis() - startTime;
                 if (elapsedTime > timeLimitMs) {
-                    this.outputStream.println(new JSONObject().put("message", "Time limit sent to train method elapsed, stopping training"));
+                    final JSONObject json = new JSONObject();
+                    json.put("action", "training_stopped");
+                    json.put("reason", "timeout");
+                    this.outputStream.println(json);
 
                     this.stopTraining = true;
                     break;
